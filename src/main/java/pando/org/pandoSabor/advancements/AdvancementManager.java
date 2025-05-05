@@ -7,7 +7,6 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.FancyAdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import org.bukkit.Material;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -35,7 +34,6 @@ public class AdvancementManager {
     }
 
     private void registerAdvancements(Player target, AdvancementTab tab) {
-        // ROOT: "Conocer a Jugador"
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         if (meta != null) {
@@ -47,7 +45,7 @@ public class AdvancementManager {
                 tab,
                 "root",
                 new FancyAdvancementDisplay(
-                        skull, // Usamos la cabeza personalizada
+                        skull,
                         "Conocer a " + target.getName(),
                         AdvancementFrameType.TASK,
                         true,
@@ -108,7 +106,6 @@ public class AdvancementManager {
             // Evita que el target se auto-conceda su propio logro
             if (mover.equals(target)) return;
 
-            // Asegúrate de que ambos estén en el mismo mundo
             if (!mover.getWorld().equals(target.getWorld())) return;
 
             // Comprueba la distancia
