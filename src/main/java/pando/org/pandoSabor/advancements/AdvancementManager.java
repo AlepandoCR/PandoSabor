@@ -1,4 +1,4 @@
-package pando.org.pandoSabor.game;
+package pando.org.pandoSabor.advancements;
 
 import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
 import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
@@ -7,20 +7,13 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.FancyAdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
 import pando.org.pandoSabor.PandoSabor;
-import pando.org.pandoSabor.playerData.SaborManager;
 import pando.org.pandoSabor.playerData.SaborPlayer;
-
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class AdvancementManager {
 
@@ -93,20 +86,20 @@ public class AdvancementManager {
     }
 
     private void registerListeners(Player target, AdvancementTab tab, BaseAdvancement matar, RootAdvancement root) {
-        tab.registerEvent(EntityDamageByEntityEvent.class, event -> {
-            if(event.getEntity() instanceof Player player){
-                if(event.getDamager() instanceof Player killer)  {
-                    if(player.equals(target) && player.isDead()){
-                        if(!matar.isGranted(killer)){
-                            matar.grant(killer);
-                            SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(killer.getUniqueId());
-                            saborPlayer.addKilledPlayer(player.getUniqueId());
-                            plugin.getSaborPlayerStorage().save(saborPlayer);
-                        }
-                    }
+        tab.registerEvent(PlayerDeathEvent.class, event -> {
+            Player player = event.getEntity(); // El que murió
+            Player killer = player.getKiller(); // El que lo mató
+
+            if (killer != null && player.equals(target)) {
+                if (!matar.isGranted(killer)) {
+                    matar.grant(killer);
+                    SaborPlayer saborPlayer = plugin.getSaborManager().getPlayer(killer.getUniqueId());
+                    saborPlayer.addKilledPlayer(player.getUniqueId());
+                    plugin.getSaborPlayerStorage().save(saborPlayer);
                 }
             }
         });
+
 
 
         tab.registerEvent(org.bukkit.event.player.PlayerMoveEvent.class, event -> {
