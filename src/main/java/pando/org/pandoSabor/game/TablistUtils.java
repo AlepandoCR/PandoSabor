@@ -17,11 +17,8 @@ public class TablistUtils {
      * Borra equipos y entradas personalizadas si fueron añadidas previamente.
      */
     public static void clearTablist(Player player, PandoSabor plugin) {
-        // Asegúrate de que esto se ejecute en el hilo principal
         Bukkit.getScheduler().runTask(plugin, () -> {
-            // Aquí va la lógica para limpiar la tablist
             player.setPlayerListHeaderFooter("", "");
-            // O cualquier otra operación en el scoreboard que estés haciendo
         });
     }
 
