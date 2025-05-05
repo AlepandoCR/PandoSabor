@@ -72,7 +72,6 @@ public class PlayerListener implements Listener {
         String msg = event.getMessage();
         Player sender = event.getPlayer();
 
-        // Comandos privados que querés filtrar
         String[] aliases = {"/tell", "/msg", "/w", "/whisper", "/pm"};
         for (String alias : aliases) {
             if (msg.toLowerCase().startsWith(alias + " ")) {
