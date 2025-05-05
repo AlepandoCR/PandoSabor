@@ -1,0 +1,4 @@
+name: PandoSabor
+version: '1.0-SNAPSHOT'
+main: pando.org.pandoSabor.PandoSabor
+api-version: '1.21'
