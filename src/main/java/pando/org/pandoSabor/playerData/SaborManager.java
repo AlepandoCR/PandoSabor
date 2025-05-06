@@ -24,6 +24,11 @@ public class SaborManager {
         saborPlayers.add(player);
     }
 
+    public void addSaborPlayerIfAbsent(@NotNull SaborPlayer player) {
+        if(saborPlayers.contains(player)) return;
+        saborPlayers.add(player);
+    }
+
     public void removeSaborPlayer(SaborPlayer player) {
         saborPlayers.remove(player);
     }

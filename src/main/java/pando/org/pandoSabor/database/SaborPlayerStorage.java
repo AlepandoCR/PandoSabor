@@ -109,7 +109,7 @@ public class SaborPlayerStorage {
                         return player;
                     } else {
                         plugin.getLogger().info("[DEBUG] No se encontraron datos para el jugador, creando " + uuid);
-                        plugin.getSaborManager().addSaborPlayer(new SaborPlayer(uuid));
+                        return new SaborPlayer(uuid);
                     }
                 }
             }

@@ -1,12 +1,19 @@
 package pando.org.pandoSabor;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.A;
+import pando.org.pandoSabor.commands.CobrarCommand;
 import pando.org.pandoSabor.database.MySQL;
 import pando.org.pandoSabor.database.SaborPlayerStorage;
 import pando.org.pandoSabor.advancements.AdvancementManager;
-import pando.org.pandoSabor.listeners.PlayerListener;
+import pando.org.pandoSabor.game.InfamyManager;
+import pando.org.pandoSabor.listeners.*;
 import pando.org.pandoSabor.playerData.SaborManager;
+import pando.org.pandoSabor.playerData.economy.WealthBlockStorage;
+import pando.org.pandoSabor.utils.Area;
 
 import java.sql.SQLException;
 
@@ -16,16 +23,26 @@ public final class PandoSabor extends JavaPlugin {
     private SaborPlayerStorage saborPlayerStorage;
     private final SaborManager saborManager = new SaborManager(this);
     private AdvancementManager advancementManager;
+    private WealthBlockStorage wealthBlockStorage;
+    private InfamyManager infamyManager;
+    private CobrarCommand cobrarCommand;
+    private InfamyDisplayManager infamyDisplayManager;
     @Override
     public void onEnable() {
-        advancementManager = new AdvancementManager(this);
-
-
-        // Plugin startup logic
         try {
             database.connect();
+
+            wealthBlockStorage = new WealthBlockStorage(database.getConnection(),this);
             saborPlayerStorage = new SaborPlayerStorage(database.getConnection(), this);
+
             saborPlayerStorage.syncTableStructure();
+
+            advancementManager = new AdvancementManager(this);
+            infamyDisplayManager = new InfamyDisplayManager(this);
+
+            cobrarCommand = new CobrarCommand(this);
+
+            infamyManager = new InfamyManager(this);
             enableListeners();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,7 +51,9 @@ public final class PandoSabor extends JavaPlugin {
     }
 
     private void enableListeners(){
-        enableListener(new PlayerListener(this));
+        Location corner1 = new Location(Bukkit.getWorld("overworld"),-384,87,-1601);
+        Location corner2 = new Location(Bukkit.getWorld("overworld"),-312,165,1689);
+        enableListener(new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(new Area(corner1,corner2,this),this));
     }
 
     private void enableListener(Listener... listeners){
@@ -48,8 +67,24 @@ public final class PandoSabor extends JavaPlugin {
         // Plugin shutdown logic
     }
 
+    public WealthBlockStorage getWealthBlockStorage() {
+        return wealthBlockStorage;
+    }
+
     public MySQL getDatabase() {
         return database;
+    }
+
+    public InfamyDisplayManager getInfamyDisplayManager() {
+        return infamyDisplayManager;
+    }
+
+    public CobrarCommand getCobrarCommand() {
+        return cobrarCommand;
+    }
+
+    public InfamyManager getInfamyManager() {
+        return infamyManager;
     }
 
     public SaborPlayerStorage getSaborPlayerStorage() {

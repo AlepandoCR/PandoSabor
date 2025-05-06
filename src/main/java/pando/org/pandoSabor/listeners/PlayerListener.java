@@ -1,9 +1,6 @@
 package pando.org.pandoSabor.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,9 +10,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.TablistDisplayAdapter;
-import pando.org.pandoSabor.game.TablistUtils;
 import pando.org.pandoSabor.playerData.SaborPlayer;
 
 import java.util.Random;
@@ -35,62 +32,59 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        Supplier<SaborPlayer> saborPlayerSupplier = () -> plugin.getSaborPlayerStorage().load(player.getUniqueId());
+        SaborPlayer aux = new SaborPlayer(uuid);
 
+        plugin.getSaborManager().startPlayer(uuid);
 
-        TablistDisplayAdapter.startLiveTablist(player,saborPlayerSupplier,plugin);
-
-        if(event.getPlayer().hasPlayedBefore()){
-            plugin.getSaborManager().startPlayer(uuid);
-        }else{
-            teleportPlayerRandomly(player);
-            plugin.getSaborManager().addSaborPlayer(new SaborPlayer(uuid));
-        }
+        startTab(player);
 
         plugin.getAdvancementManager().createPlayerTab(player);
     }
 
-    @EventHandler
-    public void onPlayerLogin(PlayerQuitEvent event){
-        plugin.getSaborManager().closePlayer(event.getPlayer().getUniqueId());
+    private void startTab(Player player) {
+        Bukkit.getScheduler().runTaskLater(plugin,r -> {
+            Supplier<SaborPlayer> saborPlayerSupplier = () -> plugin.getSaborManager().getPlayer(player.getUniqueId());
+            TablistDisplayAdapter.startLiveTablist(player,saborPlayerSupplier,plugin);
+        },20L);
     }
 
     @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player sender = event.getPlayer();
-        SaborPlayer saborSender = plugin.getSaborManager().getPlayer(sender.getUniqueId());
+    public void onPlayerDeath(PlayerDeathEvent event){
+        Player player = event.getPlayer();
+        Player killer = player.getKiller();
 
-        // Filtra los destinatarios
-        event.getRecipients().removeIf(receiver -> {
-            if (receiver.equals(sender)) return false; // Siempre puede verse a sí mismo
-            return !saborSender.getUnlockedPlayers().contains(receiver.getUniqueId());
-        });
+        if(killer == null) return;
+
+        processInfamy(killer,player);
+
     }
 
-    @EventHandler
-    public void onPrivateMessage(PlayerCommandPreprocessEvent event) {
-        String msg = event.getMessage();
-        Player sender = event.getPlayer();
+    private void processInfamy(Player killer, Player victim) {
+        int victimInfamy = plugin.getSaborPlayerStorage().load(victim.getUniqueId()).getInfamy();
 
-        String[] aliases = {"/tell", "/msg", "/w", "/whisper", "/pm"};
-        for (String alias : aliases) {
-            if (msg.toLowerCase().startsWith(alias + " ")) {
-                String[] args = msg.split(" ");
-                if (args.length < 3) return; // Comando mal formado
+        plugin.getInfamyManager().addInfamy(killer.getUniqueId(), 5);
+        plugin.getInfamyDisplayManager().checkPlayer(killer);
 
-                Player target = Bukkit.getPlayerExact(args[1]);
-                if (target == null || !target.isOnline()) return;
-
-                SaborPlayer saborSender = plugin.getSaborManager().getPlayer(sender.getUniqueId());
-
-                if (!saborSender.getUnlockedPlayers().contains(target.getUniqueId())) {
-                    sender.sendMessage(ChatColor.RED + "No conoces a ese jugador aun");
-                    event.setCancelled(true);
-                }
-
-                break;
+        if (victimInfamy >= 10) {
+            int diamonds = (int) (1 + 0.25 * victimInfamy);
+            plugin.getLogger().warning("Diamonds = " + diamonds);
+            Random random = new Random();
+            while (diamonds > 0) {
+                Location dropLoc = victim.getLocation().clone().add(
+                        (random.nextDouble() - 0.5) * 0.5,
+                        0.5,
+                        (random.nextDouble() - 0.5) * 0.5
+                );
+                victim.getWorld().dropItem(dropLoc, new ItemStack(Material.DIAMOND_BLOCK));
+                diamonds--;
             }
+
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event){
+        plugin.getSaborManager().closePlayer(event.getPlayer().getUniqueId());
     }
 
 
@@ -99,6 +93,7 @@ public class PlayerListener implements Listener {
         SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(event.getPlayer().getUniqueId());
         saborPlayer.addDeath();
         plugin.getSaborPlayerStorage().save(saborPlayer);
+        plugin.getInfamyManager().reduceInfamy(saborPlayer.getUuid(),saborPlayer.getInfamy());
     }
 
     public static void teleportPlayerRandomly(Player player) {

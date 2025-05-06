@@ -16,11 +16,13 @@ public class SaborPlayer {
     private List<UUID> killedPlayers;
     private int points;
     private int deaths;
+    private int infamy;
 
     public SaborPlayer(UUID uuid) {
         this.uuid = uuid;
         this.points = 0;
         this.deaths = 0;
+        this.infamy = 0;
         this.targets = new ArrayList<>();
         this.unlockedPlayers = new ArrayList<>();
         this.killedPlayers = new ArrayList<>();
@@ -31,6 +33,17 @@ public class SaborPlayer {
         this.unlockedPlayers = new ArrayList<>();
     }
 
+    public int getInfamy() {
+        return infamy;
+    }
+
+    public void setInfamy(int infamy) {
+        this.infamy = infamy;
+    }
+
+    public void addInfamty(int toAdd){
+        this.infamy += toAdd;
+    }
 
     public UUID getUuid() {
         return uuid;

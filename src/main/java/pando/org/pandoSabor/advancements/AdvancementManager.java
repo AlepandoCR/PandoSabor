@@ -6,6 +6,7 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.FancyAdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +14,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.entity.Player;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.playerData.SaborPlayer;
+
+import java.util.Random;
 
 public class AdvancementManager {
 
@@ -37,7 +40,7 @@ public class AdvancementManager {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         if (meta != null) {
-            meta.setOwningPlayer(target); // Esto pone la skin del jugador
+            meta.setOwningPlayer(target);
             skull.setItemMeta(meta);
         }
 
@@ -89,34 +92,39 @@ public class AdvancementManager {
             Player killer = player.getKiller(); // El que lo mató
 
             if (killer != null && player.equals(target)) {
-                if (!matar.isGranted(killer)) {
-                    matar.grant(killer);
-                    SaborPlayer saborPlayer = plugin.getSaborManager().getPlayer(killer.getUniqueId());
-                    saborPlayer.addKilledPlayer(player.getUniqueId());
-                    plugin.getSaborPlayerStorage().save(saborPlayer);
-                }
+                checkIfKilled(matar, killer, player);
             }
         });
-
-
 
         tab.registerEvent(org.bukkit.event.player.PlayerMoveEvent.class, event -> {
             Player mover = event.getPlayer();
 
-            // Evita que el target se auto-conceda su propio logro
             if (mover.equals(target)) return;
 
             if (!mover.getWorld().equals(target.getWorld())) return;
 
-            // Comprueba la distancia
-            if (mover.getLocation().distance(target.getLocation()) <= 5) {
-                if(!root.isGranted(mover)){
-                    SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(mover.getUniqueId());
-                    saborPlayer.addUnlockedPlayers(target.getUniqueId());
-                    plugin.getSaborPlayerStorage().save(saborPlayer);
-                    root.grant(mover);
-                }
-            }
+            checkIfGreeted(target, root, mover);
         });
     }
+
+    private void checkIfKilled(BaseAdvancement matar, Player killer, Player player) {
+        if (!matar.isGranted(killer)) {
+            matar.grant(killer);
+            SaborPlayer saborPlayer = plugin.getSaborManager().getPlayer(killer.getUniqueId());
+            saborPlayer.addKilledPlayer(player.getUniqueId());
+            plugin.getSaborPlayerStorage().save(saborPlayer);
+        }
+    }
+
+    private void checkIfGreeted(Player target, RootAdvancement root, Player mover) {
+        if (mover.getLocation().distance(target.getLocation()) <= 5) {
+            if(!root.isGranted(mover) && mover.canSee(target)){
+                SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(mover.getUniqueId());
+                saborPlayer.addUnlockedPlayers(target.getUniqueId());
+                plugin.getSaborPlayerStorage().save(saborPlayer);
+                root.grant(mover);
+            }
+        }
+    }
+
 }
