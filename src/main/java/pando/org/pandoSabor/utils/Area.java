@@ -5,14 +5,17 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import pando.org.pandoSabor.PandoSabor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Area {
 
@@ -102,12 +105,40 @@ public class Area {
                 (corner2.getZ() - corner1.getZ());
     }
 
+    public List<LivingEntity> getLiveEntitiesInArea() {
+        World world = corner1.getWorld();
+
+        return world.getLivingEntities().stream()
+                .filter(entity -> isInArea(entity.getLocation()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Player> getPlayersInArea() {
+        World world = corner1.getWorld();
+
+        return world.getPlayers().stream()
+                .filter(player -> isInArea(player.getLocation()))
+                .collect(Collectors.toList());
+    }
+
     public boolean overlaps(Area other) {
         if (!other.getWorld().equals(this.getWorld())) return false;
 
         return this.corner1.getX() <= other.corner2.getX() && this.corner2.getX() >= other.corner1.getX() &&
                 this.corner1.getY() <= other.corner2.getY() && this.corner2.getY() >= other.corner1.getY() &&
                 this.corner1.getZ() <= other.corner2.getZ() && this.corner2.getZ() >= other.corner1.getZ();
+    }
+
+    private boolean isInArea(Location loc) {
+        if (!loc.getWorld().equals(corner1.getWorld())) return false;
+
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
+
+        return x >= corner1.getX() && x <= corner2.getX()
+                && y >= corner1.getY() && y <= corner2.getY()
+                && z >= corner1.getZ() && z <= corner2.getZ();
     }
 
     public void expand(int amount) {

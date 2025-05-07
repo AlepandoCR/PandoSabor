@@ -118,11 +118,17 @@ public class AdvancementManager {
 
     private void checkIfGreeted(Player target, RootAdvancement root, Player mover) {
         if (mover.getLocation().distance(target.getLocation()) <= 5) {
-            if(!root.isGranted(mover) && mover.canSee(target)){
-                SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(mover.getUniqueId());
-                saborPlayer.addUnlockedPlayers(target.getUniqueId());
-                plugin.getSaborPlayerStorage().save(saborPlayer);
-                root.grant(mover);
+            if(!root.isGranted(mover) && mover.canSee(target) && target.canSee(mover)){
+
+                if(mover.isOnline() && target.isOnline() && !mover.isDead() && !target.isDead()){
+
+                    if(!plugin.getCastleArea().contains(mover) && !plugin.getCastleArea().contains(target)){
+                        SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(mover.getUniqueId());
+                        saborPlayer.addUnlockedPlayers(target.getUniqueId());
+                        plugin.getSaborPlayerStorage().save(saborPlayer);
+                        root.grant(mover);
+                    }
+                }
             }
         }
     }

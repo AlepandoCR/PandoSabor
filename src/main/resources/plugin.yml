@@ -7,3 +7,7 @@ commands:
   cobrar:
     description: Comando principal de cobrar.
     usage: /<command>
+  model:
+    description: Comando principal de models.
+    usage: /<command>
+

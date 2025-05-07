@@ -23,6 +23,7 @@ public class TablistDisplayAdapter {
             if (!viewer.isOnline()) return;
 
             SaborPlayer saborPlayer = supplier.get();
+
             String playerName = getName(saborPlayer.getUuid());
 
             int dinero = plugin.getWealthBlockStorage().getAllBlocksByPlayer(viewer.getUniqueId()).size();

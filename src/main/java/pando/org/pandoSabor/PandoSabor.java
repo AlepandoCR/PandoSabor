@@ -6,10 +6,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.units.qual.A;
 import pando.org.pandoSabor.commands.CobrarCommand;
+import pando.org.pandoSabor.commands.ModelCommand;
 import pando.org.pandoSabor.database.MySQL;
 import pando.org.pandoSabor.database.SaborPlayerStorage;
 import pando.org.pandoSabor.advancements.AdvancementManager;
 import pando.org.pandoSabor.game.InfamyManager;
+import pando.org.pandoSabor.game.arena.ArenaManager;
 import pando.org.pandoSabor.listeners.*;
 import pando.org.pandoSabor.playerData.SaborManager;
 import pando.org.pandoSabor.playerData.economy.WealthBlockStorage;
@@ -27,8 +29,20 @@ public final class PandoSabor extends JavaPlugin {
     private InfamyManager infamyManager;
     private CobrarCommand cobrarCommand;
     private InfamyDisplayManager infamyDisplayManager;
+    private ArenaManager arenaManager;
+    private ModelCommand modelCommand;
+
+    private Area CASTLE_AREA;
+
+
     @Override
     public void onEnable() {
+
+        Location corner1 = new Location(Bukkit.getWorld("overworld"),-384,87,-1601);
+        Location corner2 = new Location(Bukkit.getWorld("overworld"),-312,165,1689);
+
+        CASTLE_AREA = new Area(corner1,corner2,this);
+
         try {
             database.connect();
 
@@ -41,8 +55,12 @@ public final class PandoSabor extends JavaPlugin {
             infamyDisplayManager = new InfamyDisplayManager(this);
 
             cobrarCommand = new CobrarCommand(this);
+            modelCommand = new ModelCommand(this);
 
             infamyManager = new InfamyManager(this);
+
+            startArenaManager();
+
             enableListeners();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -50,10 +68,18 @@ public final class PandoSabor extends JavaPlugin {
         }
     }
 
+    @Override
+    public void onDisable() {
+        arenaManager.getArenaAreaManager().stopManaging();
+    }
+
+    private void startArenaManager(){
+        Area arena = new Area(new Location(Bukkit.getWorld("overworld"),-1906.5,65,592.5),new Location(Bukkit.getWorld("overworld"),-1802.5,-41,488.5),this);
+        arenaManager = new ArenaManager(arena,this);
+    }
+
     private void enableListeners(){
-        Location corner1 = new Location(Bukkit.getWorld("overworld"),-384,87,-1601);
-        Location corner2 = new Location(Bukkit.getWorld("overworld"),-312,165,1689);
-        enableListener(new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(new Area(corner1,corner2,this),this));
+        enableListener(new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
     }
 
     private void enableListener(Listener... listeners){
@@ -62,9 +88,12 @@ public final class PandoSabor extends JavaPlugin {
         }
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
+    public Area getCastleArea() {
+        return CASTLE_AREA;
+    }
+
+    public ArenaManager getArenaManager() {
+        return arenaManager;
     }
 
     public WealthBlockStorage getWealthBlockStorage() {

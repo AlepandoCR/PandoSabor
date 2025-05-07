@@ -1,5 +1,6 @@
 package pando.org.pandoSabor.database;
 
+import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.playerData.SaborPlayer;
 
@@ -73,6 +74,7 @@ public class SaborPlayerStorage {
         }
     }
 
+    @NotNull
     public SaborPlayer load(UUID uuid) {
         try {
             plugin.getLogger().info("[DEBUG] Cargando datos del jugador: " + uuid);
@@ -118,8 +120,8 @@ public class SaborPlayerStorage {
             plugin.getLogger().info("[ERROR] Error al cargar datos del jugador:");
             e.printStackTrace();
         }
-
-        return null;
+        plugin.getLogger().info("[DEBUG] No se encontraron datos para el jugador, creando " + uuid);
+        return new SaborPlayer(uuid);
     }
 
     public void createTableIfNotExists() {

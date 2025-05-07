@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.TablistDisplayAdapter;
 import pando.org.pandoSabor.playerData.SaborPlayer;
@@ -32,20 +33,25 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        SaborPlayer aux = new SaborPlayer(uuid);
+        plugin.getAdvancementManager().createPlayerTab(player);
 
         plugin.getSaborManager().startPlayer(uuid);
 
         startTab(player);
-
-        plugin.getAdvancementManager().createPlayerTab(player);
     }
 
-    private void startTab(Player player) {
+    private void startTab(@NotNull Player player) {
         Bukkit.getScheduler().runTaskLater(plugin,r -> {
-            Supplier<SaborPlayer> saborPlayerSupplier = () -> plugin.getSaborManager().getPlayer(player.getUniqueId());
+
+            SaborPlayer revision = plugin.getSaborManager().getPlayer(player.getUniqueId());
+            Supplier<SaborPlayer> saborPlayerSupplier = () -> revision;
+
+            if(saborPlayerSupplier.get() == null){
+                saborPlayerSupplier = () -> plugin.getSaborPlayerStorage().load(player.getUniqueId());
+            }
+
             TablistDisplayAdapter.startLiveTablist(player,saborPlayerSupplier,plugin);
-        },20L);
+        },40L);
     }
 
     @EventHandler

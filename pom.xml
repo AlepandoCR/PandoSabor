@@ -59,9 +59,18 @@
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
-
     <dependencies>
+        <dependency>
+            <groupId>io.github.toxicity188</groupId>
+            <artifactId>BetterModel</artifactId>
+            <version>1.5.3</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.frengor</groupId>
             <artifactId>ultimateadvancementapi</artifactId>

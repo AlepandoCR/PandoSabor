@@ -3,6 +3,7 @@ package pando.org.pandoSabor.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,13 +27,6 @@ public class ChatManager implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player sender = event.getPlayer();
-        SaborPlayer sp = plugin.getSaborManager().getPlayer(sender.getUniqueId());
-
-        // Restringir destinatarios: solo conocidos (y el mismo)
-        event.getRecipients().removeIf(r -> {
-            if (r.equals(sender)) return false;
-            return !sp.getUnlockedPlayers().contains(r.getUniqueId());
-        });
 
         // Personaliza el prefijo del jugador
         String displayName = ChatColor.YELLOW + "🍻 " + ChatColor.AQUA + sender.getName();
