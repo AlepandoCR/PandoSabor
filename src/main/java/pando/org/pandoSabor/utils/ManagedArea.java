@@ -91,7 +91,7 @@ public class ManagedArea {
         for (Player p1 : players) {
             for (Player p2 : players) {
                 if (!p1.equals(p2)) {
-                    p1.showPlayer(plugin, p2);
+                    if(!p2.isOp()) p1.showPlayer(plugin, p2);
                 }
             }
         }

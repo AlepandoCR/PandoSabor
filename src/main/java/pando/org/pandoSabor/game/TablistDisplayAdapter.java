@@ -32,7 +32,7 @@ public class TablistDisplayAdapter {
 
             // Header estilizado
             String header = "\n"
-                    + "&e\uD83C\uDF7B &b&lReino del Sabor &e\uD83C\uDF7B \n"
+                    + "&e\uD83C\uDF7B &b&lReino del Sabor &e\uD83C\uDF7B \n\n"
                     + "&6&l⟪ " + playerName + " &6&l⟫\n"
                     + "&6Dinero: &a$" + dinero
                     + " &8| &6Puntos: &a" + puntos
