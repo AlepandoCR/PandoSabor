@@ -52,14 +52,9 @@ public class ModelCommand implements CommandExecutor, TabCompleter {
         }
 
         if(args.length == 1 || scaled){
-            ArmorStand armorStand = ((Player) sender).getWorld().spawn(((Player) sender).getLocation(), ArmorStand.class, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            Model model = new Model(plugin, args[0],((Player) sender).getLocation());
 
-            armorStand.setPersistent(true);
-            armorStand.setInvulnerable(true);
-
-            Model model = new Model(plugin);
-
-            model.createModel(args[0],armorStand,scale);
+            model.createModel(scale);
         }
 
         return true;

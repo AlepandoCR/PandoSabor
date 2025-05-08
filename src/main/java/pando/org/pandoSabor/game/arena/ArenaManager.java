@@ -3,11 +3,15 @@ package pando.org.pandoSabor.game.arena;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.utils.Area;
 import pando.org.pandoSabor.utils.ManagedArea;
+import pando.org.pandoSabor.utils.Model;
 
 public class ArenaManager {
     private final Area arenaArea;
@@ -16,6 +20,7 @@ public class ArenaManager {
     private final PiglinAmbushManager piglinAmbushManager;
     private final MiniMessage mini = MiniMessage.miniMessage();
     private int deathPiglins = 0;
+    private Model firePitModel;
 
     private final static Location ARENA_SPAWN = new Location(Bukkit.getWorld("overworld"),-1861.5,19.5,548.5);
 
@@ -27,7 +32,20 @@ public class ArenaManager {
 
         arenaAreaManager.hidePlayers();
 
+        firePitModel = spawnFirePitModel(plugin);
+
         run();
+    }
+
+    @NotNull
+    private Model spawnFirePitModel(PandoSabor plugin) {
+
+        Location spawnModel = ARENA_SPAWN.clone().add(0,-0.5,0);
+
+        Model r = new Model(plugin, "souls",spawnModel);
+
+        r.createModel(2);
+        return r;
     }
 
     public void run(){
@@ -53,7 +71,7 @@ public class ArenaManager {
                     }
                     eventSeconds++;
                 } else {
-                    if (seconds % 900 == 0) {
+                    if (deathPiglins % 40 == 0) {
                         if (!arenaArea.getPlayersInArea().isEmpty()) {
                             onEvent = true;
                             arenaAreaManager.showPlayers();
@@ -76,6 +94,10 @@ public class ArenaManager {
             }
 
         }.runTaskTimer(plugin,0L,20L);
+    }
+
+    public Model getFirePitModel() {
+        return firePitModel;
     }
 
     public int getDeathPiglins() {

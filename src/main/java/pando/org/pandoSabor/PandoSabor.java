@@ -16,6 +16,7 @@ import pando.org.pandoSabor.listeners.*;
 import pando.org.pandoSabor.playerData.SaborManager;
 import pando.org.pandoSabor.playerData.economy.WealthBlockStorage;
 import pando.org.pandoSabor.utils.Area;
+import pando.org.pandoSabor.utils.ModelManager;
 
 import java.sql.SQLException;
 
@@ -31,6 +32,8 @@ public final class PandoSabor extends JavaPlugin {
     private InfamyDisplayManager infamyDisplayManager;
     private ArenaManager arenaManager;
     private ModelCommand modelCommand;
+    private ModelManager modelManager;
+    private ModelListener modelListener;
 
     private Area CASTLE_AREA;
 
@@ -54,10 +57,13 @@ public final class PandoSabor extends JavaPlugin {
             advancementManager = new AdvancementManager(this);
             infamyDisplayManager = new InfamyDisplayManager(this);
 
+            modelManager = new ModelManager(this);
+
             cobrarCommand = new CobrarCommand(this);
             modelCommand = new ModelCommand(this);
 
             infamyManager = new InfamyManager(this);
+            modelListener = new ModelListener(this);
 
             startArenaManager();
 
@@ -79,13 +85,17 @@ public final class PandoSabor extends JavaPlugin {
     }
 
     private void enableListeners(){
-        enableListener(new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
+        enableListener(modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
     }
 
     private void enableListener(Listener... listeners){
         for (Listener listener : listeners) {
             getServer().getPluginManager().registerEvents(listener,this);
         }
+    }
+
+    public ModelManager getModelManager() {
+        return modelManager;
     }
 
     public Area getCastleArea() {
