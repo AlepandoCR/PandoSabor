@@ -52,10 +52,11 @@ public class AreaPlayerVisibilityController implements Listener {
                 boolean isBInArea = playersInArea.contains(playerB.getUniqueId());
 
                 if (isAInArea && isBInArea) {
-                    // Ambos dentro: NO se ven
-                   playerA.hidePlayer(plugin, playerB);
+                    // Ambos dentro: no
+                    if(!playerA.isOp())  playerA.hidePlayer(plugin, playerB);
+
                 } else if (!isAInArea && isBInArea) {
-                    // A fuera, B dentro: NO se ven
+                    // A fuera, B dentro: no
                     if(!playerA.isOp()) playerA.hidePlayer(plugin, playerB);
                 } else {
                     // A puede ver a B

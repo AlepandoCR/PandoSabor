@@ -52,7 +52,6 @@ public class TablistUtils {
                 fakeTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
             }
 
-            // Eliminar entradas anteriores
             Set<String> oldEntries = fakeEntriesMap.getOrDefault(player.getUniqueId(), new HashSet<>());
             for (String old : oldEntries) {
                 scoreboard.resetScores(old);
@@ -61,7 +60,6 @@ public class TablistUtils {
 
             Set<String> newEntries = new HashSet<>();
 
-            // Obtener o registrar el objective
             Objective objective = scoreboard.getObjective("fake");
             if (objective == null) {
                 objective = scoreboard.registerNewObjective("fake", "dummy", "FakeTab");
@@ -75,7 +73,6 @@ public class TablistUtils {
                     entry = entry.substring(0, 16);
                 }
 
-                // Asegurar que no se repita
                 if (scoreboard.getEntries().contains(entry)) continue;
 
                 Score score = objective.getScore(entry);

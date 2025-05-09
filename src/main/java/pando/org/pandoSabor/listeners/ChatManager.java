@@ -28,16 +28,13 @@ public class ChatManager implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         Player sender = event.getPlayer();
 
-        // Personaliza el prefijo del jugador
-        String displayName = ChatColor.YELLOW + "🍻 " + ChatColor.AQUA + sender.getName();
+        String displayName = ChatColor.GOLD + "🍻 " + ChatColor.GRAY + sender.getName();
 
-        // Decora el mensaje
+
         String message = ChatColor.DARK_GRAY + "» " + ChatColor.WHITE + event.getMessage();
 
-        // Prefijo general con marco
         String prefix = ChatColor.DARK_PURPLE + "[" + ChatColor.LIGHT_PURPLE + "Sabor" + ChatColor.DARK_PURPLE + "] ";
 
-        // Resultado final
         event.setFormat(prefix + displayName + " " + message);
     }
 

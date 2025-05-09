@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.K;
 import pando.org.pandoSabor.commands.CobrarCommand;
 import pando.org.pandoSabor.commands.ModelCommand;
 import pando.org.pandoSabor.database.MySQL;
@@ -12,9 +13,15 @@ import pando.org.pandoSabor.database.SaborPlayerStorage;
 import pando.org.pandoSabor.advancements.AdvancementManager;
 import pando.org.pandoSabor.game.InfamyManager;
 import pando.org.pandoSabor.game.arena.ArenaManager;
+import pando.org.pandoSabor.game.rey.King;
+import pando.org.pandoSabor.game.rey.KingAngerSystem;
+import pando.org.pandoSabor.game.rey.quests.QuestGenerator;
+import pando.org.pandoSabor.game.rey.quests.QuestManager;
 import pando.org.pandoSabor.listeners.*;
 import pando.org.pandoSabor.playerData.SaborManager;
 import pando.org.pandoSabor.playerData.economy.WealthBlockStorage;
+import pando.org.pandoSabor.trades.tradeMenus.TradeMenusManager;
+import pando.org.pandoSabor.trades.tradeMenus.menus.MenuListener;
 import pando.org.pandoSabor.utils.Area;
 import pando.org.pandoSabor.utils.ModelManager;
 
@@ -34,6 +41,11 @@ public final class PandoSabor extends JavaPlugin {
     private ModelCommand modelCommand;
     private ModelManager modelManager;
     private ModelListener modelListener;
+    private QuestManager questManager;
+    private King king;
+    private KingAngerSystem kingAngerSystem;
+    private TradeMenusManager tradeMenusManager;
+    private MenuListener menuListener;
 
     private Area CASTLE_AREA;
 
@@ -56,6 +68,7 @@ public final class PandoSabor extends JavaPlugin {
 
             advancementManager = new AdvancementManager(this);
             infamyDisplayManager = new InfamyDisplayManager(this);
+            tradeMenusManager = new TradeMenusManager(this);
 
             modelManager = new ModelManager(this);
 
@@ -64,10 +77,22 @@ public final class PandoSabor extends JavaPlugin {
 
             infamyManager = new InfamyManager(this);
             modelListener = new ModelListener(this);
+            menuListener = new MenuListener(this);
+
 
             startArenaManager();
 
+            king = new King(this, new QuestGenerator(this));
+            kingAngerSystem = new KingAngerSystem(this);
+
             enableListeners();
+
+            questManager = new QuestManager(this);
+
+            questManager.startCheckingQuests();
+
+            kingAngerSystem.start();
+
         } catch (SQLException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
@@ -85,13 +110,25 @@ public final class PandoSabor extends JavaPlugin {
     }
 
     private void enableListeners(){
-        enableListener(modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
+        enableListener(menuListener, modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
     }
 
     private void enableListener(Listener... listeners){
         for (Listener listener : listeners) {
             getServer().getPluginManager().registerEvents(listener,this);
         }
+    }
+
+    public TradeMenusManager getTradeMenusManager() {
+        return tradeMenusManager;
+    }
+
+    public QuestManager getQuestManager() {
+        return questManager;
+    }
+
+    public King getKing() {
+        return king;
     }
 
     public ModelManager getModelManager() {

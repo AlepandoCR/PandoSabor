@@ -45,7 +45,6 @@ public class WealthBlock {
         return world + ":" + x + "," + y + "," + z;
     }
 
-    @Nullable
     public Location getLocation() {
         return new Location(Bukkit.getWorld(world), x, y, z);
     }

@@ -30,7 +30,6 @@ public class TablistDisplayAdapter {
             int puntos = saborPlayer.getPoints();
             int muertes = saborPlayer.getDeaths();
 
-            // Header estilizado
             String header = "\n"
                     + "&e\uD83C\uDF7B &b&lReino del Sabor &e\uD83C\uDF7B \n\n"
                     + "&6&l⟪ " + playerName + " &6&l⟫\n"
@@ -39,7 +38,6 @@ public class TablistDisplayAdapter {
                     + " &8| &6Muertes: &c" + muertes + "/3"
                     + "\n";
 
-            // Footer decorado
             String footer = "\n"
                     + "&7Jugadores conocidos: &b" + saborPlayer.getUnlockedPlayers().size()
                     + " &8| &7Asesinados: &c" + saborPlayer.getKilledPlayers().size()
@@ -48,7 +46,7 @@ public class TablistDisplayAdapter {
 
             TablistUtils.clearTablist(viewer, plugin);
             TablistUtils.setTabHeaderFooter(viewer, header, footer, plugin);
-        }, 0L, 20L); // Actualiza cada segundo
+        }, 0L, 20L);
     }
 
 

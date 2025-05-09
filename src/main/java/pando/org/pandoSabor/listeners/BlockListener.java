@@ -18,6 +18,7 @@ import pando.org.pandoSabor.playerData.SaborPlayer;
 import pando.org.pandoSabor.playerData.economy.WealthBlock;
 import pando.org.pandoSabor.playerData.economy.WealthBlockStorage;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -38,8 +39,34 @@ public class BlockListener implements Listener {
         Player player = event.getPlayer();
 
         if(event.getBlock().getType().equals(Material.DIAMOND_BLOCK)){
-            WealthBlock wealthBlock = new WealthBlock(player.getUniqueId(),player.getWorld().getName(),event.getBlock().getLocation(),"DIAMOND_BLOCK");
-            wealthBlockStorage.saveBlock(wealthBlock);
+            List<WealthBlock> wealthBlocks = wealthBlockStorage.getAllBlocksByPlayer(player.getUniqueId());
+
+            if(wealthBlocks == null) return;
+
+            if(wealthBlocks.isEmpty()) {
+                WealthBlock wealthBlock = new WealthBlock(player.getUniqueId(),player.getWorld().getName(),event.getBlock().getLocation(),"DIAMOND_BLOCK");
+                wealthBlockStorage.saveBlock(wealthBlock);
+                return;
+            }
+
+            if(wealthBlocks.getLast() == null) return;
+
+            Location location = wealthBlocks.getLast().getLocation();
+
+            if(location != null){
+                if(location.distance(event.getBlock().getLocation()) < 5){
+                    WealthBlock wealthBlock = new WealthBlock(player.getUniqueId(),player.getWorld().getName(),event.getBlock().getLocation(),"DIAMOND_BLOCK");
+                    wealthBlockStorage.saveBlock(wealthBlock);
+                    return;
+                }
+            }
+
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.GOLD + "[" + ChatColor.YELLOW + "Economía del Sabor" + ChatColor.GOLD + "] "
+                    + ChatColor.GRAY + "El bloque debe estar al menos a " + ChatColor.RED + "5 "
+                    + ChatColor.GRAY + "bloques de distancia del anterior"
+            );
+
         }
     }
 

@@ -20,7 +20,7 @@ public class ArenaManager {
     private final PiglinAmbushManager piglinAmbushManager;
     private final MiniMessage mini = MiniMessage.miniMessage();
     private int deathPiglins = 0;
-    private Model firePitModel;
+    private final Model firePitModel;
 
     private final static Location ARENA_SPAWN = new Location(Bukkit.getWorld("overworld"),-1861.5,19.5,548.5);
 

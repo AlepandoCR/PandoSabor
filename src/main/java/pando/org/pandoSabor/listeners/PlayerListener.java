@@ -1,5 +1,8 @@
 package pando.org.pandoSabor.listeners;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,6 +19,8 @@ import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.TablistDisplayAdapter;
 import pando.org.pandoSabor.playerData.SaborPlayer;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -23,9 +28,24 @@ import java.util.function.Supplier;
 public class PlayerListener implements Listener {
 
     private final PandoSabor plugin;
+    private final List<Location> spawnLocations;
 
     public PlayerListener(PandoSabor plugin) {
         this.plugin = plugin;
+
+        World targetWorld = Bukkit.getWorld("overworld");
+
+        this.spawnLocations = startLocations(targetWorld);
+    }
+
+    @NotNull
+    private static List<Location> startLocations(World targetWorld) {
+        return Arrays.asList(
+                new Location(targetWorld, -2017.5, 109.5, -319.5),
+                new Location(targetWorld, -2024.5, 101.5, -320.5),
+                new Location(targetWorld, -2023.5, 101.5, -331.5),
+                new Location(targetWorld, -2024.5, 102.5, -325.5)
+        );
     }
 
     @EventHandler
@@ -38,6 +58,52 @@ public class PlayerListener implements Listener {
         plugin.getSaborManager().startPlayer(uuid);
 
         startTab(player);
+
+        formatJoinMsg(event, player);
+
+        tavernTp(player);
+    }
+
+    private static void formatJoinMsg(PlayerJoinEvent event, Player player) {
+        if (!player.hasPlayedBefore()) {
+            event.joinMessage(
+                    Component.text("» ")
+                            .color(NamedTextColor.LIGHT_PURPLE)
+                            .append(Component.text(player.getName())
+                                    .color(NamedTextColor.GOLD)
+                                    .decorate(TextDecoration.BOLD))
+                            .append(Component.text(" ha despertado en la taberna por primera vez."))
+                            .color(NamedTextColor.GRAY)
+            );
+        } else {
+            event.joinMessage(
+                    Component.text("» ")
+                            .color(NamedTextColor.YELLOW)
+                            .append(Component.text(player.getName())
+                                    .color(NamedTextColor.GREEN))
+                            .append(Component.text(" ha regresado al reino."))
+                            .color(NamedTextColor.GRAY)
+            );
+        }
+
+        if (player.isOp()) {
+            event.joinMessage(null);
+        }
+    }
+
+    public void tavernTp(Player player){
+        Random random = new Random();
+        if (!player.hasPlayedBefore()) {
+            Location chosenLocation = spawnLocations.get(random.nextInt(spawnLocations.size()));
+
+            chosenLocation.getChunk().load();
+
+            Bukkit.getScheduler().runTaskLater(
+                   plugin,
+                    () -> player.teleport(chosenLocation),
+                    1L
+            );
+        }
     }
 
     private void startTab(@NotNull Player player) {

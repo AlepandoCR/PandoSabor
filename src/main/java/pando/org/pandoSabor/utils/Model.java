@@ -2,6 +2,7 @@ package pando.org.pandoSabor.utils;
 
 import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.BetterModelPlugin;
+import kr.toxicity.model.api.bone.BoneTag;
 import kr.toxicity.model.api.data.renderer.BlueprintRenderer;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.TrackerModifier;
@@ -9,7 +10,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import pando.org.pandoSabor.PandoSabor;
 
@@ -53,6 +53,10 @@ public class Model {
         plugin.getModelManager().addModel(this);
     }
 
+    public String getName() {
+        return name;
+    }
+
     private void spawnBase(Location location) {
 
         if(base != null && (!base.isDead() || base.isValid())){
@@ -63,6 +67,7 @@ public class Model {
 
         base.setPersistent(true);
         base.setInvulnerable(true);
+        base.addScoreboardTag(name);
     }
 
     public BlueprintRenderer getBlueprintRenderer() {
