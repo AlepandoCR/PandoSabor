@@ -1,7 +1,9 @@
-package pando.org.pandoSabor.playerData.economy;
+package pando.org.pandoSabor.database;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import pando.org.pandoSabor.PandoSabor;
+import pando.org.pandoSabor.playerData.economy.WealthBlock;
 
 import java.sql.*;
 import java.util.*;
@@ -19,46 +21,52 @@ public class WealthBlockStorage {
     }
 
     private void createTableIfNeeded() {
-        String sql = "CREATE TABLE IF NOT EXISTS wealth_blocks (" +
-                "owner_uuid VARCHAR(36), " +
-                "world VARCHAR(100), " +
-                "x INT, y INT, z INT, " +
-                "material VARCHAR(50), " +
-                "PRIMARY KEY (world, x, y, z)" +
-                ")";
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[WealthBlockStorage] Error creando tabla: " + e.getMessage());
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String sql = "CREATE TABLE IF NOT EXISTS wealth_blocks (" +
+                    "owner_uuid VARCHAR(36), " +
+                    "world VARCHAR(100), " +
+                    "x INT, y INT, z INT, " +
+                    "material VARCHAR(50), " +
+                    "PRIMARY KEY (world, x, y, z)" +
+                    ")";
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute(sql);
+            } catch (SQLException e) {
+                plugin.getLogger().severe("[WealthBlockStorage] Error creando tabla: " + e.getMessage());
+            }
+        });
     }
 
     public void saveBlock(WealthBlock block) {
-        String sql = "REPLACE INTO wealth_blocks (owner_uuid, world, x, y, z, material) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, block.getOwnerUuid().toString());
-            ps.setString(2, block.getWorld());
-            ps.setInt(3, block.getX());
-            ps.setInt(4, block.getY());
-            ps.setInt(5, block.getZ());
-            ps.setString(6, block.getMaterial());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[WealthBlockStorage] Error guardando bloque: " + e.getMessage());
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String sql = "REPLACE INTO wealth_blocks (owner_uuid, world, x, y, z, material) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, block.getOwnerUuid().toString());
+                ps.setString(2, block.getWorld());
+                ps.setInt(3, block.getX());
+                ps.setInt(4, block.getY());
+                ps.setInt(5, block.getZ());
+                ps.setString(6, block.getMaterial());
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().severe("[WealthBlockStorage] Error guardando bloque: " + e.getMessage());
+            }
+        });
     }
 
     public void removeBlock(String world, int x, int y, int z) {
-        String sql = "DELETE FROM wealth_blocks WHERE world = ? AND x = ? AND y = ? AND z = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, world);
-            ps.setInt(2, x);
-            ps.setInt(3, y);
-            ps.setInt(4, z);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            plugin.getLogger().severe("[WealthBlockStorage] Error eliminando bloque: " + e.getMessage());
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String sql = "DELETE FROM wealth_blocks WHERE world = ? AND x = ? AND y = ? AND z = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, world);
+                ps.setInt(2, x);
+                ps.setInt(3, y);
+                ps.setInt(4, z);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().severe("[WealthBlockStorage] Error eliminando bloque: " + e.getMessage());
+            }
+        });
     }
 
     public void removeBlock(String world, Location location) {

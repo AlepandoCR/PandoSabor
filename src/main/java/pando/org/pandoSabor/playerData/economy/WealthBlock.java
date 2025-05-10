@@ -3,6 +3,7 @@ package pando.org.pandoSabor.playerData.economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import pando.org.pandoSabor.PandoSabor;
 
 import javax.annotation.Nullable;
@@ -49,10 +50,15 @@ public class WealthBlock {
         return new Location(Bukkit.getWorld(world), x, y, z);
     }
 
-    public void chargeBlock(PandoSabor plugin){
-        if(getLocation() != null){
-            plugin.getWealthBlockStorage().removeBlock(world,getLocation());
-            getLocation().getBlock().setType(Material.AIR);
+    public void chargeBlock(PandoSabor plugin) {
+        Location loc = getLocation();
+        if (loc != null) {
+            loc.getBlock().setType(Material.AIR);
+
+            plugin.getWealthBlockStorage().removeBlock(loc.getWorld().getName(), loc);
+
         }
     }
+
+
 }

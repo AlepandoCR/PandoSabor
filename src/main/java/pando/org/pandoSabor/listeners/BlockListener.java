@@ -1,27 +1,17 @@
 package pando.org.pandoSabor.listeners;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import pando.org.pandoSabor.PandoSabor;
-import pando.org.pandoSabor.game.TablistDisplayAdapter;
-import pando.org.pandoSabor.playerData.SaborPlayer;
 import pando.org.pandoSabor.playerData.economy.WealthBlock;
-import pando.org.pandoSabor.playerData.economy.WealthBlockStorage;
+import pando.org.pandoSabor.database.WealthBlockStorage;
 
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 public class BlockListener implements Listener {
 
@@ -34,40 +24,59 @@ public class BlockListener implements Listener {
         this.wealthBlockStorage = plugin.getWealthBlockStorage();
     }
 
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event){
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+
         Player player = event.getPlayer();
 
-        if(event.getBlock().getType().equals(Material.DIAMOND_BLOCK)){
-            List<WealthBlock> wealthBlocks = wealthBlockStorage.getAllBlocksByPlayer(player.getUniqueId());
+        if (!event.getBlock().getType().equals(Material.DIAMOND_BLOCK)) return;
 
-            if(wealthBlocks == null) return;
+        List<WealthBlock> wealthBlocks = wealthBlockStorage.getAllBlocksByPlayer(player.getUniqueId());
+        if (wealthBlocks == null) return;
 
-            if(wealthBlocks.isEmpty()) {
-                WealthBlock wealthBlock = new WealthBlock(player.getUniqueId(),player.getWorld().getName(),event.getBlock().getLocation(),"DIAMOND_BLOCK");
-                wealthBlockStorage.saveBlock(wealthBlock);
-                return;
-            }
-
-            if(wealthBlocks.getLast() == null) return;
-
-            Location location = wealthBlocks.getLast().getLocation();
-
-            if(location != null){
-                if(location.distance(event.getBlock().getLocation()) < 5){
-                    WealthBlock wealthBlock = new WealthBlock(player.getUniqueId(),player.getWorld().getName(),event.getBlock().getLocation(),"DIAMOND_BLOCK");
-                    wealthBlockStorage.saveBlock(wealthBlock);
-                    return;
-                }
-            }
-
-            event.setCancelled(true);
-            player.sendMessage(ChatColor.GOLD + "[" + ChatColor.YELLOW + "Economía del Sabor" + ChatColor.GOLD + "] "
-                    + ChatColor.GRAY + "El bloque debe estar al menos a " + ChatColor.RED + "5 "
-                    + ChatColor.GRAY + "bloques de distancia del anterior"
+        if (wealthBlocks.isEmpty()) {
+            WealthBlock wealthBlock = new WealthBlock(
+                    player.getUniqueId(),
+                    player.getWorld().getName(),
+                    event.getBlock().getLocation(),
+                    "DIAMOND_BLOCK"
             );
-
+            wealthBlockStorage.saveBlock(wealthBlock);
+            return;
         }
+
+        WealthBlock lastBlock = wealthBlocks.getLast();
+        if (lastBlock == null) return;
+
+        Location lastLocation = lastBlock.getLocation();
+
+        if(lastLocation != null && lastLocation.getWorld().equals(event.getBlock().getWorld())){
+            if (lastLocation.distance(event.getBlock().getLocation()) >= 5) {
+                WealthBlock wealthBlock = new WealthBlock(
+                        player.getUniqueId(),
+                        player.getWorld().getName(),
+                        event.getBlock().getLocation(),
+                        "DIAMOND_BLOCK"
+                );
+                wealthBlockStorage.saveBlock(wealthBlock);
+            }else{
+                sendDistanceWarn(player);
+                event.setCancelled(true);
+            }
+        }else{
+            sendDistanceWarn(player);
+            event.setCancelled(true);
+        }
+
+
+    }
+
+    private void sendDistanceWarn(Player player) {
+        player.sendMessage(ChatColor.GOLD + "[" + ChatColor.YELLOW + "Economía del Sabor" + ChatColor.GOLD + "] "
+                + ChatColor.GRAY + "El bloque debe estar al menos a " + ChatColor.RED + "5 "
+                + ChatColor.GRAY + "bloques de distancia del anterior"
+        );
     }
 
     @EventHandler

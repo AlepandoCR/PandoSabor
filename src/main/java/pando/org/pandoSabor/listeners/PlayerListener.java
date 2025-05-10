@@ -4,6 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,10 +18,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Attr;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.TablistDisplayAdapter;
 import pando.org.pandoSabor.playerData.SaborPlayer;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -62,6 +67,25 @@ public class PlayerListener implements Listener {
         formatJoinMsg(event, player);
 
         tavernTp(player);
+
+        setRandomScale(player);
+    }
+
+    private void setRandomScale(Player player) {
+
+        if(player.hasPlayedBefore()) return;
+
+        AttributeInstance attribute = player.getAttribute(Attribute.SCALE);
+
+        if (attribute == null) {
+            player.registerAttribute(Attribute.SCALE);
+            attribute = player.getAttribute(Attribute.SCALE);
+        }
+
+        if (attribute != null) {
+            double amount = 0.8 + (Math.random() * 0.4);
+            attribute.setBaseValue(amount);
+        }
     }
 
     private static void formatJoinMsg(PlayerJoinEvent event, Player player) {
@@ -161,12 +185,44 @@ public class PlayerListener implements Listener {
 
 
     @EventHandler
-    public void onPlayerDeathEvent(PlayerDeathEvent event){
-        SaborPlayer saborPlayer =  plugin.getSaborManager().getPlayer(event.getPlayer().getUniqueId());
+    public void onPlayerDeathEvent(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        SaborPlayer saborPlayer = plugin.getSaborManager().getPlayer(player.getUniqueId());
+
+        // Registrar la muerte
         saborPlayer.addDeath();
         plugin.getSaborPlayerStorage().save(saborPlayer);
-        plugin.getInfamyManager().reduceInfamy(saborPlayer.getUuid(),saborPlayer.getInfamy());
+
+        // Eliminar infamia al morir
+        plugin.getInfamyManager().reduceInfamy(saborPlayer.getUuid(), saborPlayer.getInfamy());
+
+        // Chequear si llegó a 3 muertes
+        if (saborPlayer.getDeaths() >= 3) {
+
+            if(player.isOp()) return;
+
+            banAndMsg(player);
+        }
     }
+
+    private static void banAndMsg(Player player) {
+        String reason = ChatColor.RED + "👑 El Rey Saborgón habla:\n" +
+                ChatColor.GOLD + "\"¡Tres veces has fallado en mantener tu pellejo con sabor! " +
+                "Y ahora, como dicta mi ley glotona... ¡serás exiliado del Reino del Sabor!\"\n\n" +
+                ChatColor.DARK_RED + "Has sido baneado por perder tus 3 vidas.";
+
+
+        player.ban(reason, Duration.ofDays(100),"Sistema del Rey");
+
+        String broadcast = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "⚠" + ChatColor.DARK_GRAY + "] " +
+                ChatColor.GRAY + "El Rey Saborgón ha declarado la " + ChatColor.RED + "expulsión definitiva "
+                + ChatColor.GRAY + "de " + ChatColor.YELLOW + player.getName() + ChatColor.GRAY +
+                " por perder sus " + ChatColor.GOLD + "3 vidas" + ChatColor.GRAY + ". ¡Una " +
+                ChatColor.DARK_RED + "muerte con sabor" + ChatColor.GRAY + "!";
+
+        Bukkit.broadcastMessage(broadcast);
+    }
+
 
     public static void teleportPlayerRandomly(Player player) {
         Random random = new Random();

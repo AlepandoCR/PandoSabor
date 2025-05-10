@@ -1,5 +1,6 @@
 package pando.org.pandoSabor.database;
 
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.playerData.SaborPlayer;
@@ -21,57 +22,59 @@ public class SaborPlayerStorage {
     }
 
     public void save(SaborPlayer player) {
-        try {
-            plugin.getLogger().info("[DEBUG] Guardando datos del jugador: " + player.getUuid());
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                plugin.getLogger().info("[DEBUG] Guardando datos del jugador: " + player.getUuid());
 
-            Class<?> clazz = SaborPlayer.class;
-            Field[] fields = clazz.getDeclaredFields();
+                Class<?> clazz = SaborPlayer.class;
+                Field[] fields = clazz.getDeclaredFields();
 
-            StringBuilder query = new StringBuilder("REPLACE INTO sabor_players (");
-            StringBuilder values = new StringBuilder(" VALUES (");
+                StringBuilder query = new StringBuilder("REPLACE INTO sabor_players (");
+                StringBuilder values = new StringBuilder(" VALUES (");
 
-            List<Object> paramValues = new ArrayList<>();
+                List<Object> paramValues = new ArrayList<>();
 
-            for (Field field : fields) {
-                field.setAccessible(true);
-                query.append(field.getName()).append(",");
-                values.append("?,");
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    query.append(field.getName()).append(",");
+                    values.append("?,");
 
-                Object value = field.get(player);
+                    Object value = field.get(player);
 
-                if (value instanceof UUID) {
-                    value = value.toString();
+                    if (value instanceof UUID) {
+                        value = value.toString();
+                    }
+
+                    if (value instanceof List<?>) {
+                        List<?> list = (List<?>) value;
+                        value = list.stream().map(Object::toString).collect(Collectors.joining(","));
+                    }
+
+                    paramValues.add(value);
+
                 }
 
-                if (value instanceof List<?>) {
-                    List<?> list = (List<?>) value;
-                    value = list.stream().map(Object::toString).collect(Collectors.joining(","));
+                // Quitar la última coma
+                query.setLength(query.length() - 1);
+                values.setLength(values.length() - 1);
+                query.append(")").append(values).append(")");
+
+                plugin.getLogger().info("[DEBUG] Query SQL generada: " + query);
+                plugin.getLogger().info("[DEBUG] Valores: " + paramValues);
+
+                try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+                    for (int i = 0; i < paramValues.size(); i++) {
+                        stmt.setObject(i + 1, paramValues.get(i));
+                    }
+                    stmt.executeUpdate();
+                    plugin.getLogger().info("[DEBUG] Datos guardados exitosamente para " + player.getUuid());
                 }
 
-                paramValues.add(value);
-
+            } catch (Exception e) {
+                plugin.getLogger().info("[ERROR] Error al guardar datos del jugador:");
+                e.printStackTrace();
             }
-
-            // Quitar la última coma
-            query.setLength(query.length() - 1);
-            values.setLength(values.length() - 1);
-            query.append(")").append(values).append(")");
-
-            plugin.getLogger().info("[DEBUG] Query SQL generada: " + query);
-            plugin.getLogger().info("[DEBUG] Valores: " + paramValues);
-
-            try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
-                for (int i = 0; i < paramValues.size(); i++) {
-                    stmt.setObject(i + 1, paramValues.get(i));
-                }
-                stmt.executeUpdate();
-                plugin.getLogger().info("[DEBUG] Datos guardados exitosamente para " + player.getUuid());
-            }
-
-        } catch (Exception e) {
-            plugin.getLogger().info("[ERROR] Error al guardar datos del jugador:");
-            e.printStackTrace();
-        }
+        });
     }
 
     @NotNull
@@ -125,35 +128,37 @@ public class SaborPlayerStorage {
     }
 
     public void createTableIfNotExists() {
-        try {
-            plugin.getLogger().info("[DEBUG] Verificando/creando tabla 'sabor_players'...");
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                plugin.getLogger().info("[DEBUG] Verificando/creando tabla 'sabor_players'...");
 
-            StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS sabor_players (");
+                StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS sabor_players (");
 
-            Field[] fields = SaborPlayer.class.getDeclaredFields();
-            List<String> columns = new ArrayList<>();
+                Field[] fields = SaborPlayer.class.getDeclaredFields();
+                List<String> columns = new ArrayList<>();
 
-            for (Field field : fields) {
-                field.setAccessible(true);
-                String name = field.getName();
-                String type = getSQLType(field.getType());
-                columns.add(name + " " + type);
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    String name = field.getName();
+                    String type = getSQLType(field.getType());
+                    columns.add(name + " " + type);
+                }
+
+                sb.append(String.join(", ", columns));
+                sb.append(", PRIMARY KEY (uuid));");
+
+                plugin.getLogger().info("[DEBUG] Query de creación de tabla: " + sb);
+
+                try (Statement stmt = connection.createStatement()) {
+                    stmt.executeUpdate(sb.toString());
+                    plugin.getLogger().info("[DEBUG] Tabla 'sabor_players' verificada/creada correctamente.");
+                }
+
+            } catch (SQLException e) {
+                plugin.getLogger().info("[ERROR] Error al crear/verificar la tabla:");
+                e.printStackTrace();
             }
-
-            sb.append(String.join(", ", columns));
-            sb.append(", PRIMARY KEY (uuid));");
-
-            plugin.getLogger().info("[DEBUG] Query de creación de tabla: " + sb);
-
-            try (Statement stmt = connection.createStatement()) {
-                stmt.executeUpdate(sb.toString());
-                plugin.getLogger().info("[DEBUG] Tabla 'sabor_players' verificada/creada correctamente.");
-            }
-
-        } catch (SQLException e) {
-            plugin.getLogger().info("[ERROR] Error al crear/verificar la tabla:");
-            e.printStackTrace();
-        }
+        });
     }
 
     private String getSQLType(Class<?> type) {
@@ -168,55 +173,57 @@ public class SaborPlayerStorage {
     }
 
     public void syncTableStructure() {
-        try {
-            DatabaseMetaData meta = connection.getMetaData();
-            String tableName = "sabor_players";
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                DatabaseMetaData meta = connection.getMetaData();
+                String tableName = "sabor_players";
 
-            // Verificar si la tabla existe
-            ResultSet tables = meta.getTables(null, null, tableName, null);
-            if (!tables.next()) {
-                // No existe, crearla completamente
-                createTableIfNotExists();
-                return;
-            }
+                // Verificar si la tabla existe
+                ResultSet tables = meta.getTables(null, null, tableName, null);
+                if (!tables.next()) {
+                    // No existe, crearla completamente
+                    createTableIfNotExists();
+                    return;
+                }
 
-            // Tabla existe: obtener columnas existentes
-            ResultSet columns = meta.getColumns(null, null, tableName, null);
-            Set<String> existingColumns = new HashSet<>();
-            Map<String, String> existingTypes = new HashMap<>();
-            while (columns.next()) {
-                String colName = columns.getString("COLUMN_NAME").toLowerCase();
-                String type = columns.getString("TYPE_NAME").toUpperCase();
-                existingColumns.add(colName);
-                existingTypes.put(colName, type);
-            }
+                // Tabla existe: obtener columnas existentes
+                ResultSet columns = meta.getColumns(null, null, tableName, null);
+                Set<String> existingColumns = new HashSet<>();
+                Map<String, String> existingTypes = new HashMap<>();
+                while (columns.next()) {
+                    String colName = columns.getString("COLUMN_NAME").toLowerCase();
+                    String type = columns.getString("TYPE_NAME").toUpperCase();
+                    existingColumns.add(colName);
+                    existingTypes.put(colName, type);
+                }
 
-            Class<?> clazz = SaborPlayer.class;
-            Field[] fields = clazz.getDeclaredFields();
+                Class<?> clazz = SaborPlayer.class;
+                Field[] fields = clazz.getDeclaredFields();
 
-            for (Field field : fields) {
-                String fieldName = field.getName().toLowerCase();
-                String sqlType = getSQLTypeForField(field);
+                for (Field field : fields) {
+                    String fieldName = field.getName().toLowerCase();
+                    String sqlType = getSQLTypeForField(field);
 
-                if (!existingColumns.contains(fieldName)) {
-                    String alter = "ALTER TABLE " + tableName + " ADD COLUMN " + fieldName + " " + sqlType + ";";
-                    plugin.getLogger().info("[DEBUG] Agregando nueva columna: " + fieldName + " (" + sqlType + ")");
-                    try (Statement stmt = connection.createStatement()) {
-                        stmt.executeUpdate(alter);
-                    }
-                } else if (fieldName.equals("uuid") && !existingTypes.get(fieldName).startsWith("VARCHAR")) {
-                    String alter = "ALTER TABLE " + tableName + " MODIFY COLUMN uuid VARCHAR(36);";
-                    plugin.getLogger().info("[DEBUG] Corrigiendo tipo de uuid a VARCHAR(36)");
-                    try (Statement stmt = connection.createStatement()) {
-                        stmt.executeUpdate(alter);
+                    if (!existingColumns.contains(fieldName)) {
+                        String alter = "ALTER TABLE " + tableName + " ADD COLUMN " + fieldName + " " + sqlType + ";";
+                        plugin.getLogger().info("[DEBUG] Agregando nueva columna: " + fieldName + " (" + sqlType + ")");
+                        try (Statement stmt = connection.createStatement()) {
+                            stmt.executeUpdate(alter);
+                        }
+                    } else if (fieldName.equals("uuid") && !existingTypes.get(fieldName).startsWith("VARCHAR")) {
+                        String alter = "ALTER TABLE " + tableName + " MODIFY COLUMN uuid VARCHAR(36);";
+                        plugin.getLogger().info("[DEBUG] Corrigiendo tipo de uuid a VARCHAR(36)");
+                        try (Statement stmt = connection.createStatement()) {
+                            stmt.executeUpdate(alter);
+                        }
                     }
                 }
-            }
 
-        } catch (SQLException e) {
-            plugin.getLogger().info("[ERROR] Error al sincronizar estructura de tabla:");
-            e.printStackTrace();
-        }
+            } catch (SQLException e) {
+                plugin.getLogger().info("[ERROR] Error al sincronizar estructura de tabla:");
+                e.printStackTrace();
+            }
+        });
     }
 
     private String getSQLTypeForField(Field field) {

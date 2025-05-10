@@ -17,7 +17,7 @@ public class Trade {
     private final PandoSabor plugin;
     private final Player player;
 
-    private final String PREFIX = ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "BlockShop" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
+    private final String PREFIX = ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "SaborShop" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
     public Trade(ItemStack stack, int price, PandoSabor plugin, Player player) {
         this.stack = stack;
