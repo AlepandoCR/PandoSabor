@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import pando.org.pandoSabor.PandoSabor;
+import pando.org.pandoSabor.discord.DiscordNotifier;
 import pando.org.pandoSabor.playerData.economy.WealthBlock;
 import pando.org.pandoSabor.database.WealthBlockStorage;
 
@@ -52,7 +53,7 @@ public class BlockListener implements Listener {
         Location lastLocation = lastBlock.getLocation();
 
         if(lastLocation != null && lastLocation.getWorld().equals(event.getBlock().getWorld())){
-            if (lastLocation.distance(event.getBlock().getLocation()) >= 5) {
+            if (lastLocation.distance(event.getBlock().getLocation()) <= 5) {
                 WealthBlock wealthBlock = new WealthBlock(
                         player.getUniqueId(),
                         player.getWorld().getName(),
@@ -74,7 +75,7 @@ public class BlockListener implements Listener {
 
     private void sendDistanceWarn(Player player) {
         player.sendMessage(ChatColor.GOLD + "[" + ChatColor.YELLOW + "Economía del Sabor" + ChatColor.GOLD + "] "
-                + ChatColor.GRAY + "El bloque debe estar al menos a " + ChatColor.RED + "5 "
+                + ChatColor.GRAY + "El bloque debe estar máximo a " + ChatColor.RED + "5 "
                 + ChatColor.GRAY + "bloques de distancia del anterior"
         );
     }
@@ -89,7 +90,14 @@ public class BlockListener implements Listener {
             if(wealthBlock != null){
                 wealthBlockStorage.removeBlock(player.getWorld().getName(),event.getBlock().getLocation());
                 if(!player.getUniqueId().equals(wealthBlock.getOwnerUuid())){
+
+
+                    DiscordNotifier.notifyRobbery(wealthBlock.getOwnerUuid());
+
+
                     Player stolenFrom = Bukkit.getPlayer(wealthBlock.getOwnerUuid());
+
+
 
                    if(stolenFrom != null && stolenFrom.isOnline()){
                        stolenFrom.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.RED + " te ha robado");

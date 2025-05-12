@@ -9,6 +9,7 @@ import pando.org.pandoSabor.commands.ModelCommand;
 import pando.org.pandoSabor.database.MySQL;
 import pando.org.pandoSabor.database.SaborPlayerStorage;
 import pando.org.pandoSabor.advancements.AdvancementManager;
+import pando.org.pandoSabor.discord.DiscordListener;
 import pando.org.pandoSabor.game.InfamyManager;
 import pando.org.pandoSabor.game.arena.ArenaManager;
 import pando.org.pandoSabor.game.rey.King;
@@ -24,6 +25,8 @@ import pando.org.pandoSabor.utils.Area;
 import pando.org.pandoSabor.utils.ModelManager;
 
 import java.sql.SQLException;
+
+import static pando.org.pandoSabor.discord.tab.FakeTabUtil.startTabUpdater;
 
 public final class PandoSabor extends JavaPlugin {
 
@@ -44,6 +47,7 @@ public final class PandoSabor extends JavaPlugin {
     private KingAngerSystem kingAngerSystem;
     private TradeMenusManager tradeMenusManager;
     private MenuListener menuListener;
+    private DiscordListener discordListener;
 
     private Area CASTLE_AREA;
 
@@ -76,9 +80,12 @@ public final class PandoSabor extends JavaPlugin {
             infamyManager = new InfamyManager(this);
             modelListener = new ModelListener(this);
             menuListener = new MenuListener(this);
+            discordListener = new DiscordListener(this);
 
 
             startArenaManager();
+
+            startTabUpdater(this);
 
             king = new King(this, new QuestGenerator(this));
             kingAngerSystem = new KingAngerSystem(this);
@@ -108,7 +115,7 @@ public final class PandoSabor extends JavaPlugin {
     }
 
     private void enableListeners(){
-        enableListener(menuListener, modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
+        enableListener(discordListener ,menuListener, modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
     }
 
     private void enableListener(Listener... listeners){
