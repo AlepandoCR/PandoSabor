@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import pando.org.pandoSabor.commands.BossCommand;
 import pando.org.pandoSabor.commands.CobrarCommand;
 import pando.org.pandoSabor.commands.ModelCommand;
 import pando.org.pandoSabor.database.MySQL;
@@ -48,6 +49,7 @@ public final class PandoSabor extends JavaPlugin {
     private TradeMenusManager tradeMenusManager;
     private MenuListener menuListener;
     private DiscordListener discordListener;
+    private BossCommand bossCommand;
 
     private Area CASTLE_AREA;
 
@@ -76,6 +78,7 @@ public final class PandoSabor extends JavaPlugin {
 
             cobrarCommand = new CobrarCommand(this);
             modelCommand = new ModelCommand(this);
+            bossCommand = new BossCommand(this);
 
             infamyManager = new InfamyManager(this);
             modelListener = new ModelListener(this);

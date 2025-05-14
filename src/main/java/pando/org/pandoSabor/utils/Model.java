@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import pando.org.pandoSabor.PandoSabor;
@@ -43,6 +44,7 @@ public class Model {
 
         startChunkUpdate();
     }
+
 
     private void defaults() {
         this.scale = 1;
@@ -113,6 +115,20 @@ public class Model {
         saveChunk();
     }
 
+    public void spawn(LivingEntity base) {
+        if(modelRenderer != null){
+            this.base = base;
+
+            if(base == null) return;
+
+            tracker = modelRenderer.create(base, TrackerModifier.builder().scale(() -> scale).build());
+            tracker.autoSpawn(true);
+            tracker.forRemoval(false);
+            tracker.spawnNearby();
+        }
+        saveChunk();
+    }
+
     public void despawn(){
         if(modelRenderer != null){
             setUpdateChunks(false);
@@ -121,7 +137,7 @@ public class Model {
         }
     }
 
-    private void doAnimation(String name){
+    public void doAnimation(String name){
         for (String animation : modelRenderer.animations()) {
             if(Objects.equals(animation, name)){
                 tracker.animate(name, AnimationModifier.DEFAULT);
@@ -130,7 +146,7 @@ public class Model {
 
     }
 
-    private void stopAnimation(String name){
+    public void stopAnimation(String name){
         for (String animation : modelRenderer.animations()) {
             if(Objects.equals(animation, name)){
                 tracker.stopAnimation(name);

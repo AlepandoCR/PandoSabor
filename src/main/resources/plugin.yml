@@ -10,4 +10,7 @@ commands:
   model:
     description: Comando principal de models.
     usage: /<command>
+  boss:
+    description: Comando principal de boss.
+    usage: /<command>
 
