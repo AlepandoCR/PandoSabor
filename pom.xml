@@ -94,7 +94,7 @@
         <dependency>
             <groupId>io.github.toxicity188</groupId>
             <artifactId>BetterModel</artifactId>
-            <version>1.5.4</version>
+            <version>1.5.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

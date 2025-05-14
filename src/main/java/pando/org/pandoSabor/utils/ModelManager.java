@@ -1,6 +1,7 @@
 package pando.org.pandoSabor.utils;
 
 import org.bukkit.Chunk;
+import org.bukkit.entity.Entity;
 import pando.org.pandoSabor.PandoSabor;
 
 import java.util.ArrayList;
@@ -24,6 +25,19 @@ public class ModelManager {
         return models;
     }
 
+    public Model getModel(Entity base){
+        Model r = null;
+
+        for (Model model : models) {
+            if (model.getBase().equals(base)) {
+                r = model;
+                break;
+            }
+        }
+
+        return r;
+    }
+
     public void addModel(Model... models){
         this.models.addAll(Arrays.asList(models));
     }
@@ -34,7 +48,11 @@ public class ModelManager {
 
     public void unloadModelsOnChunk(Chunk chunk){
         for (Model model : models) {
-            if(model.getChunk().equals(chunk)){
+            Chunk modelChunk = model.getChunk();
+
+            if(modelChunk == null) continue;
+
+            if(modelChunk.equals(chunk)){
                 model.despawn();
             }
         }
@@ -42,7 +60,11 @@ public class ModelManager {
 
     public void loadModelsOnChunk(Chunk chunk){
         for (Model model : models) {
-            if(model.getChunk().equals(chunk)){
+            Chunk modelChunk = model.getChunk();
+
+            if(modelChunk == null) continue;
+
+            if(modelChunk.equals(chunk)){
                 model.spawn();
             }
         }

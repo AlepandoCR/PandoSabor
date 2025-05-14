@@ -2,8 +2,8 @@ package pando.org.pandoSabor.utils;
 
 import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.BetterModelPlugin;
-import kr.toxicity.model.api.bone.BoneTag;
-import kr.toxicity.model.api.data.renderer.BlueprintRenderer;
+import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.data.renderer.ModelRenderer;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.TrackerModifier;
 import org.bukkit.Chunk;
@@ -11,7 +11,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import pando.org.pandoSabor.PandoSabor;
+
+import java.util.Objects;
 
 public class Model {
     private final PandoSabor plugin;
@@ -20,9 +23,10 @@ public class Model {
     private Entity base;
     private Chunk chunk;
     private float scale;
-    private String name;
-    private final BlueprintRenderer blueprintRenderer;
+    private final String name;
+    private final ModelRenderer modelRenderer;
     private final Location location;
+    private boolean updateChunks = true;
 
     public Model(PandoSabor plugin, String name, Location location) {
         this.plugin = plugin;
@@ -33,15 +37,36 @@ public class Model {
 
         this.location = location;
 
-        this.blueprintRenderer = betterModelPlugin.modelManager().renderer(name);
+        this.modelRenderer = betterModelPlugin.modelManager().renderer(name);
 
         defaults();
+
+        startChunkUpdate();
     }
 
     private void defaults() {
         this.scale = 1;
         this.chunk = null;
         this.base = null;
+    }
+
+    private void startChunkUpdate(){
+        new BukkitRunnable(){
+
+            @Override
+            public void run() {
+                if(updateChunks){
+                    saveChunk();
+                }else{
+                    cancel();
+                }
+            }
+
+        }.runTaskTimer(plugin,0,20L);
+    }
+
+    public void setUpdateChunks(boolean updateChunks) {
+        this.updateChunks = updateChunks;
     }
 
     public void createModel(float scale){
@@ -70,16 +95,16 @@ public class Model {
         base.addScoreboardTag(name);
     }
 
-    public BlueprintRenderer getBlueprintRenderer() {
-        return blueprintRenderer;
+    public ModelRenderer getModelRenderer() {
+        return modelRenderer;
     }
 
     public void spawn() {
-        if(blueprintRenderer != null){
+        if(modelRenderer != null){
 
             spawnBase(location);
 
-            tracker = blueprintRenderer.create(base, TrackerModifier.builder().scale(() -> scale).build());
+            tracker = modelRenderer.create(base, TrackerModifier.builder().scale(() -> scale).build());
             tracker.autoSpawn(true);
             tracker.forRemoval(false);
             tracker.spawnNearby();
@@ -89,10 +114,29 @@ public class Model {
     }
 
     public void despawn(){
-        if(blueprintRenderer != null){
+        if(modelRenderer != null){
+            setUpdateChunks(false);
             tracker.despawn();
             base.remove();
         }
+    }
+
+    private void doAnimation(String name){
+        for (String animation : modelRenderer.animations()) {
+            if(Objects.equals(animation, name)){
+                tracker.animate(name, AnimationModifier.DEFAULT);
+            }
+        }
+
+    }
+
+    private void stopAnimation(String name){
+        for (String animation : modelRenderer.animations()) {
+            if(Objects.equals(animation, name)){
+                tracker.stopAnimation(name);
+            }
+        }
+
     }
 
     private void saveChunk() {

@@ -28,9 +28,7 @@ public class DiscordListener extends ListenerAdapter implements Listener {
     }
 
     private void startDiscordListener(PandoSabor plugin) {
-        Bukkit.getScheduler().runTaskLater(plugin, r -> {
-           register(DiscordSRV.getPlugin().getJda());
-        }, 20L * 6);
+        Bukkit.getScheduler().runTaskLater(plugin, r -> register(DiscordSRV.getPlugin().getJda()), 20L * 6);
     }
 
     public void register(JDA jda) {

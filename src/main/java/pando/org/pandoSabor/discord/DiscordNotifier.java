@@ -2,9 +2,6 @@ package pando.org.pandoSabor.discord;
 
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.DiscordSRV;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import java.util.UUID;
 
 public class DiscordNotifier {
@@ -19,9 +16,7 @@ public class DiscordNotifier {
         User user = DiscordSRV.getPlugin().getJda().retrieveUserById(discordId).complete();
 
         if (user != null) {
-            user.openPrivateChannel().queue(channel -> {
-                channel.sendMessage("⚠️ ¡Alerta! Están robando tus diamantes en el Reino del Sabor...").queue();
-            });
+            user.openPrivateChannel().queue(channel -> channel.sendMessage("⚠️ ¡Alerta! Están robando tus diamantes en el Reino del Sabor...").queue());
         }
     }
 }
