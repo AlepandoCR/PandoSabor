@@ -7,6 +7,8 @@ import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -16,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.arena.ArenaManager;
 import pando.org.pandoSabor.game.arena.PiglinAmbushManager;
+import pando.org.pandoSabor.game.boss.destroyer.CustomVindicator;
 
 public class EntityListener implements Listener {
 
@@ -41,6 +44,21 @@ public class EntityListener implements Listener {
                     }else {
                         event.setCancelled(true);
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageByEntityEvent event){
+        if(event.getEntity() instanceof CustomVindicator vindicator){
+            if(event.getDamager() instanceof Player player){
+                if(!vindicator.getPlayerDamage().containsKey(player)){
+                    vindicator.getPlayerDamage().put(player,event.getDamage());
+                }else{
+                   double total = vindicator.getPlayerDamage().get(player) + event.getDamage();
+
+                   vindicator.getPlayerDamage().put(player,total);
                 }
             }
         }

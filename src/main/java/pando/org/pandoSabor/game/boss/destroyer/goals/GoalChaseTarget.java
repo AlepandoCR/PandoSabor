@@ -18,7 +18,7 @@ public class GoalChaseTarget extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity target = boss.getTarget();
-        return target != null && !boss.isAttacking() && !boss.isFlying() &&  target.distanceTo(boss) > 1.5;
+        return target != null && !boss.isAttacking() && !boss.isFlying() && target.distanceTo(boss) > 3.5;
     }
 
     @Override
@@ -42,9 +42,9 @@ public class GoalChaseTarget extends Goal {
 
         if(target == null) return false;
 
-        if(target.distanceTo(boss) > 2.0){
+        if(target.distanceTo(boss) > 3.5){
             boss.setAttackCooldown(0);
         }
-        return target.isAlive() && !boss.isFlying() && !boss.isAttacking() && target.distanceTo(boss) > 2.0;
+        return target.isAlive() && !boss.isFlying() && !boss.isAttacking() && target.distanceTo(boss) > 3.5;
     }
 }

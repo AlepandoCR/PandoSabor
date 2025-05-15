@@ -23,7 +23,7 @@ public class BossSpawner {
 
         base.setModel(model);
 
-        model.spawn((LivingEntity) base.getBukkitEntity());
+        model.createModel(1.7f, (LivingEntity) base.getBukkitEntity());
     }
 
 }

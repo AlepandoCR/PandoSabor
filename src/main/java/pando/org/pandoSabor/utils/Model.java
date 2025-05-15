@@ -3,9 +3,11 @@ package pando.org.pandoSabor.utils;
 import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.BetterModelPlugin;
 import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.bone.RenderedBone;
 import kr.toxicity.model.api.data.renderer.ModelRenderer;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.TrackerModifier;
+import kr.toxicity.model.api.util.BonePredicate;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -16,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import pando.org.pandoSabor.PandoSabor;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class Model {
     private final PandoSabor plugin;
@@ -76,6 +79,15 @@ public class Model {
         this.scale = scale;
 
         spawn();
+
+        plugin.getModelManager().addModel(this);
+    }
+
+    public void createModel(float scale,LivingEntity base){
+
+        this.scale = scale;
+
+        spawn(base);
 
         plugin.getModelManager().addModel(this);
     }
@@ -153,6 +165,20 @@ public class Model {
             }
         }
 
+    }
+
+    public void setGlowing(int rgb){
+        for (RenderedBone bone : tracker.bones()) {
+            Predicate<RenderedBone> renderedBonePredicate =  Predicate.isEqual(bone);
+            bone.glow(BonePredicate.of(renderedBonePredicate), true, rgb);
+        }
+    }
+
+    public void stopGlowing(){
+        for (RenderedBone bone : tracker.bones()) {
+            Predicate<RenderedBone> renderedBonePredicate =  Predicate.isEqual(bone);
+            bone.glow(BonePredicate.of(renderedBonePredicate), false, 0);
+        }
     }
 
     private void saveChunk() {
