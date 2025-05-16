@@ -25,7 +25,7 @@ public class PlayerDataCommand extends DiscordCommand {
 
     @Override
     public String setDescription() {
-        return "Muestra la skin del jugador especificado en 3D.";
+        return "Investiga al Jugador especificado";
     }
 
     @Override

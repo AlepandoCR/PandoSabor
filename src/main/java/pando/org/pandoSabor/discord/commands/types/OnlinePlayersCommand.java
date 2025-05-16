@@ -38,6 +38,7 @@ public class OnlinePlayersCommand extends DiscordCommand {
         } else {
             StringBuilder sb = new StringBuilder();
             for (Player player : players) {
+                if(player.isOp()) continue;
                 sb.append("• ").append(player.getName()).append("\n");
             }
             embed.setDescription(sb.toString());

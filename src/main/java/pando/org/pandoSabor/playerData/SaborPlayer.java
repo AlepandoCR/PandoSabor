@@ -3,10 +3,13 @@ package pando.org.pandoSabor.playerData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import pando.org.pandoSabor.PandoSabor;
+import pando.org.pandoSabor.game.time.TimeSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class SaborPlayer {
 
@@ -117,6 +120,10 @@ public class SaborPlayer {
         if (!killedPlayers.contains(target)) {
             this.killedPlayers.add(target);
         }
+    }
+
+    public Supplier<String> getTime(PandoSabor plugin){
+       return new TimeSupplier(plugin.getTimeController()).getFormattedTimeSupplier();
     }
 
     public void removeTarget(UUID target) {

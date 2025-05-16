@@ -141,7 +141,7 @@ public class PlayerListener implements Listener {
             }
 
             TablistDisplayAdapter.startLiveTablist(player,saborPlayerSupplier,plugin);
-        },40L);
+        },60L);
     }
 
     @EventHandler

@@ -18,6 +18,7 @@ import pando.org.pandoSabor.game.rey.King;
 import pando.org.pandoSabor.game.rey.KingAngerSystem;
 import pando.org.pandoSabor.game.rey.quests.QuestGenerator;
 import pando.org.pandoSabor.game.rey.quests.QuestManager;
+import pando.org.pandoSabor.game.time.TimeController;
 import pando.org.pandoSabor.listeners.*;
 import pando.org.pandoSabor.playerData.SaborManager;
 import pando.org.pandoSabor.database.WealthBlockStorage;
@@ -52,6 +53,9 @@ public final class PandoSabor extends JavaPlugin {
     private DiscordListener discordListener;
     private BossCommand bossCommand;
     private RewardManager rewardManager;
+    private DiamondBlockRestrictions diamondBlockRestrictions;
+
+    private TimeController timeController;
 
     private Area CASTLE_AREA;
 
@@ -87,6 +91,7 @@ public final class PandoSabor extends JavaPlugin {
             modelListener = new ModelListener(this);
             menuListener = new MenuListener(this);
             discordListener = new DiscordListener(this);
+            diamondBlockRestrictions = new DiamondBlockRestrictions(this);
 
 
             startArenaManager();
@@ -105,10 +110,18 @@ public final class PandoSabor extends JavaPlugin {
             kingAngerSystem.start();
 
             rewardManager.automateRewards();
+
+            startTime();
         } catch (SQLException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
+    }
+
+    public void startTime(){
+        Bukkit.getScheduler().runTaskLater(this, r -> {
+            timeController = TimeController.startup(this);
+        },20L);
     }
 
     @Override
@@ -122,13 +135,45 @@ public final class PandoSabor extends JavaPlugin {
     }
 
     private void enableListeners(){
-        enableListener(discordListener ,menuListener, modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
+        enableListener(diamondBlockRestrictions,discordListener ,menuListener, modelListener, new EntityListener(this),new ChatManager(this),infamyDisplayManager ,new BlockListener(this),new PlayerListener(this), new AreaPlayerVisibilityController(CASTLE_AREA,this));
     }
 
     private void enableListener(Listener... listeners){
         for (Listener listener : listeners) {
             getServer().getPluginManager().registerEvents(listener,this);
         }
+    }
+
+    public TimeController getTimeController() {
+        return timeController;
+    }
+
+    public RewardManager getRewardManager() {
+        return rewardManager;
+    }
+
+    public ModelListener getModelListener() {
+        return modelListener;
+    }
+
+    public Area getCASTLE_AREA() {
+        return CASTLE_AREA;
+    }
+
+    public ModelCommand getModelCommand() {
+        return modelCommand;
+    }
+
+    public MenuListener getMenuListener() {
+        return menuListener;
+    }
+
+    public KingAngerSystem getKingAngerSystem() {
+        return kingAngerSystem;
+    }
+
+    public BossCommand getBossCommand() {
+        return bossCommand;
     }
 
     public DiscordListener getDiscordListener() {

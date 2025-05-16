@@ -6,6 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
+import pando.org.pandoSabor.game.time.TimeSupplier;
 import pando.org.pandoSabor.playerData.SaborPlayer;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class TablistDisplayAdapter {
             int puntos = saborPlayer.getPoints();
             int muertes = saborPlayer.getDeaths();
 
+            String time = saborPlayer.getTime(plugin).get();
+
             String header = "\n"
                     + "&e\uD83C\uDF7B &b&lReino del Sabor &e\uD83C\uDF7B \n\n"
                     + "&6&l⟪ " + playerName + " &6&l⟫\n"
@@ -41,7 +44,8 @@ public class TablistDisplayAdapter {
             String footer = "\n"
                     + "&7Jugadores conocidos: &b" + saborPlayer.getUnlockedPlayers().size()
                     + " &8| &7Asesinados: &c" + saborPlayer.getKilledPlayers().size()
-                    + "\n" + "\n" + "&7Infamia: &e" + saborPlayer.getInfamy() + " &6🔥" + "\n" + "\n" + "\n"
+                    + "\n" + "\n" + "&7Infamia: &e" + saborPlayer.getInfamy() + " &6🔥" + "\n" + "\n"
+                    + "&dHora: " + time + "\n" + "\n"
                     + "&7¡No sabrás nada de quien no conoces!";
 
             TablistUtils.clearTablist(viewer, plugin);

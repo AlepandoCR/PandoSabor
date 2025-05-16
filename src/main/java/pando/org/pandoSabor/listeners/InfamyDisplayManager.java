@@ -25,7 +25,6 @@ public class InfamyDisplayManager implements Listener {
 
     public InfamyDisplayManager(PandoSabor plugin) {
         this.plugin = plugin;
-        startDisplayUpdater();
     }
 
     public void checkPlayer(Player player) {
@@ -50,24 +49,36 @@ public class InfamyDisplayManager implements Listener {
         // Item Display
         ItemDisplay itemDisplay = (ItemDisplay) world.spawnEntity(loc, EntityType.ITEM_DISPLAY);
         itemDisplay.setItemStack(new ItemStack(Material.DIAMOND_BLOCK));
-        itemDisplay.setBillboard(Display.Billboard.VERTICAL);
+        itemDisplay.setBillboard(Display.Billboard.CENTER);
         itemDisplay.setInterpolationDuration(1);
         itemDisplay.setTransformation(new Transformation(
-                new Vector3f(),                       // posición
-                new AxisAngle4f(),                   // rotación inicial
-                new Vector3f(0.3f, 0.3f, 0.3f),      // escala pequeña
-                new AxisAngle4f()                    // rotación final
+                new Vector3f(0,0.5f,0),// posición
+                new AxisAngle4f(),     // rotación inicial
+                new Vector3f(0.3f, 0.3f, 0.3f),// escala pequeña
+                new AxisAngle4f()      // rotación final
         ));
 
 
         // Text Display
-        TextDisplay textDisplay = (TextDisplay) world.spawnEntity(loc.clone().add(0, 0.75, 0), EntityType.TEXT_DISPLAY);
+        TextDisplay textDisplay = (TextDisplay) world.spawnEntity(loc, EntityType.TEXT_DISPLAY);
         textDisplay.setBillboard(Display.Billboard.CENTER);
+        textDisplay.setAlignment(TextDisplay.TextAlignment.CENTER);
         textDisplay.text(Component.text("§b" + getDiamondsForInfamy(infamy)));
         textDisplay.setSeeThrough(false);
+        textDisplay.setShadowed(true);
         textDisplay.setBackgroundColor(Color.fromARGB(128, 0, 0, 0));
+        textDisplay.setTransformation(new Transformation(
+                new Vector3f(0,1f,0),// posición
+                new AxisAngle4f(),   // rotación inicial
+                new Vector3f(),      // escala pequeña
+                new AxisAngle4f()    // rotación final
+        ));
 
         activeDisplays.put(player.getUniqueId(), new DisplayPair(itemDisplay, textDisplay));
+
+
+        player.addPassenger(itemDisplay);
+        player.addPassenger(textDisplay);
     }
 
     private void updateDisplay(Player player, int infamy) {
@@ -91,27 +102,6 @@ public class InfamyDisplayManager implements Listener {
 
     private int getDiamondsForInfamy(int infamy) {
         return (int) (1 + 0.25 * infamy);
-    }
-
-    private void startDisplayUpdater() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Map.Entry<UUID, DisplayPair> entry : activeDisplays.entrySet()) {
-                    Player player = Bukkit.getPlayer(entry.getKey());
-                    if (player == null || !player.isOnline()) {
-                        plugin.getLogger().warning("Player null when moving display");
-                        continue;
-                    }
-
-                    Location baseLoc = player.getLocation().clone().add(0, 2.5, 0).setRotation(0,0);
-                    DisplayPair pair = entry.getValue();
-
-                    pair.itemDisplay.teleport(baseLoc);
-                    pair.textDisplay.teleport(baseLoc.clone().add(0, 0.32, 0));
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
     }
 
 

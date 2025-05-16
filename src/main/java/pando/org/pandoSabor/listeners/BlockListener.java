@@ -102,6 +102,7 @@ public class BlockListener implements Listener {
                    if(stolenFrom != null && stolenFrom.isOnline()){
                        stolenFrom.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.RED + " te ha robado");
                        plugin.getInfamyManager().addInfamy(player.getUniqueId(),3);
+                       plugin.getInfamyDisplayManager().checkPlayer(player);
                    }
                 }
             }
