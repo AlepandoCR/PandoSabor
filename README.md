@@ -3,7 +3,7 @@
 
 ## 📦 Descargas
 
-[![Release](https://img.shields.io/github/v/v1.0.0/AlepandoCR/PandoSabor?label=v1.0.0)](https://github.com/AlepandoCR/PandoSabor/releases/latest)
+[![Release](https://img.shields.io/github/v/Launch/AlepandoCR/PandoSabor?label=v1.0.0)](https://github.com/AlepandoCR/PandoSabor/releases/latest)
 
 - 👉 [Descargar plugin `.jar`](https://github.com/AlepandoCR/repositorio/releases/download/v1.0.0/PandoSabor-1.0.0.jar)
 
