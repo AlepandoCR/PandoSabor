@@ -92,7 +92,7 @@ public class BlockListener implements Listener {
                 if(!player.getUniqueId().equals(wealthBlock.getOwnerUuid())){
 
 
-                    DiscordNotifier.notifyRobbery(wealthBlock.getOwnerUuid());
+                    DiscordNotifier.notifyRobbery(wealthBlock.getOwnerUuid(), player.getName());
 
 
                     Player stolenFrom = Bukkit.getPlayer(wealthBlock.getOwnerUuid());

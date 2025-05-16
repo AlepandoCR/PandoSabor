@@ -79,11 +79,6 @@ public class GoalFlyToCenter extends Goal {
         boss.setFlying(false);
     }
 
-
-
-
-
-
     private void startStormEvent(CustomVindicator center, List<Player> targets) {
 
         World world = center.level().getWorld();
@@ -119,7 +114,13 @@ public class GoalFlyToCenter extends Goal {
                         Vector perpendicular = new Vector(-toCenter.getZ(), 0, toCenter.getX());
                         if (perpendicular.lengthSquared() < 0.0001) continue;
 
-                        player.setVelocity(perpendicular.normalize().multiply(0.1));
+
+                        double distance = loc.distance(centerLoc);
+                        double force = 0.02 + (radius - distance) * 0.005;
+                        Vector windForce = perpendicular.normalize().multiply(force);
+                        player.setVelocity(player.getVelocity().add(windForce));
+
+
                     }
                 }
 
@@ -172,7 +173,7 @@ public class GoalFlyToCenter extends Goal {
                     return;
                 }
 
-                for (int i = 0; i < 40; i++) {
+                for (int i = 0; i < 25; i++) {
                     double angle = random.nextDouble() * 2 * Math.PI;
                     double distance = random.nextDouble() * radius;
                     double x = center.getX() + Math.cos(angle) * distance;

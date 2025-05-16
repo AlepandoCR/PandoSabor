@@ -12,6 +12,7 @@ import pando.org.pandoSabor.database.SaborPlayerStorage;
 import pando.org.pandoSabor.advancements.AdvancementManager;
 import pando.org.pandoSabor.discord.DiscordListener;
 import pando.org.pandoSabor.game.InfamyManager;
+import pando.org.pandoSabor.game.RewardManager;
 import pando.org.pandoSabor.game.arena.ArenaManager;
 import pando.org.pandoSabor.game.rey.King;
 import pando.org.pandoSabor.game.rey.KingAngerSystem;
@@ -50,6 +51,7 @@ public final class PandoSabor extends JavaPlugin {
     private MenuListener menuListener;
     private DiscordListener discordListener;
     private BossCommand bossCommand;
+    private RewardManager rewardManager;
 
     private Area CASTLE_AREA;
 
@@ -73,6 +75,7 @@ public final class PandoSabor extends JavaPlugin {
             advancementManager = new AdvancementManager(this);
             infamyDisplayManager = new InfamyDisplayManager(this);
             tradeMenusManager = new TradeMenusManager(this);
+            rewardManager = new RewardManager(this);
 
             modelManager = new ModelManager(this);
 
@@ -101,6 +104,7 @@ public final class PandoSabor extends JavaPlugin {
 
             kingAngerSystem.start();
 
+            rewardManager.automateRewards();
         } catch (SQLException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
@@ -125,6 +129,10 @@ public final class PandoSabor extends JavaPlugin {
         for (Listener listener : listeners) {
             getServer().getPluginManager().registerEvents(listener,this);
         }
+    }
+
+    public DiscordListener getDiscordListener() {
+        return discordListener;
     }
 
     public TradeMenusManager getTradeMenusManager() {

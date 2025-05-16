@@ -12,19 +12,36 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 import pando.org.pandoSabor.PandoSabor;
-import pando.org.pandoSabor.discord.tab.FakeTabUtil;
+import pando.org.pandoSabor.discord.commands.types.*;
+import pando.org.pandoSabor.discord.commands.DiscordCommand;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DiscordListener extends ListenerAdapter implements Listener {
 
     private final PandoSabor plugin;
+    private final List<DiscordCommand> commands = new ArrayList<>();
     private final Map<String, Boolean> chatToggles = new HashMap<>();
 
     public DiscordListener(PandoSabor plugin) {
         this.plugin = plugin;
         startDiscordListener(plugin);
+        startCommands();
+    }
+
+    private void startCommands(){
+        commands.add(new ChatCommand(plugin));
+        commands.add(new HelpCommand(plugin));
+        commands.add(new MessagePlayerCommand(plugin));
+        commands.add(new OnlinePlayersCommand(plugin));
+        commands.add(new PlayerDataCommand(plugin));
+    }
+
+    public Map<String, Boolean> getChatToggles() {
+        return chatToggles;
     }
 
     private void startDiscordListener(PandoSabor plugin) {
@@ -44,29 +61,21 @@ public class DiscordListener extends ListenerAdapter implements Listener {
         String discordUserId = event.getAuthor().getId();
         String message = event.getMessage().getContentRaw();
 
-        if (message.equalsIgnoreCase("!chat")) {
-            boolean current = chatToggles.getOrDefault(discordUserId, false);
-            chatToggles.put(discordUserId, !current);
+        boolean commandExecuted = false;
 
-            event.getChannel().sendMessage(
-                    current ?
-                            "🛑 Chat relay desactivado. Ya no verás ni enviarás mensajes al servidor." :
-                            "✅ Ahora estás conectado al chat del servidor. Tus mensajes serán reenviados."
-            ).queue();
-
-            String connection = current ? "§cdesconectado" : "§6conectado";
-            String formatted = "§8[§bDiscord§8] §b🤖 §7" + senderName + " §8» §7" + "Se ha " + connection + " §7al chat desde §bDiscord";
-            Bukkit.broadcastMessage(formatted);
-
-            if (current) {
-                FakeTabUtil.removeFakePlayer(senderName);
-            } else {
-                FakeTabUtil.addFakePlayer(senderName);
+        for (DiscordCommand command : commands) {
+            if(message.startsWith(command.getPrefix())){
+                command.task(event);
+                commandExecuted = true;
             }
-
-            return;
         }
 
+        if(commandExecuted) return;
+
+        relayChat(discordUserId, senderName, message);
+    }
+
+    private void relayChat(String discordUserId, String senderName, String message) {
         if (chatToggles.getOrDefault(discordUserId, false)) {
 
             Bukkit.getScheduler().runTask(plugin, () -> {
@@ -87,6 +96,10 @@ public class DiscordListener extends ListenerAdapter implements Listener {
                 });
             });
         }
+    }
+
+    public List<DiscordCommand> getCommands() {
+        return commands;
     }
 
     @EventHandler

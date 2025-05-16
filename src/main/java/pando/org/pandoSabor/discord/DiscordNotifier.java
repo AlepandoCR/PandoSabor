@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class DiscordNotifier {
 
-    public static void notifyRobbery(UUID player) {
+    public static void notifyRobbery(UUID player, String robber) {
         String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player);
 
         if (discordId == null) {
@@ -16,7 +16,7 @@ public class DiscordNotifier {
         User user = DiscordSRV.getPlugin().getJda().retrieveUserById(discordId).complete();
 
         if (user != null) {
-            user.openPrivateChannel().queue(channel -> channel.sendMessage("⚠️ ¡Alerta! Están robando tus diamantes en el Reino del Sabor...").queue());
+            user.openPrivateChannel().queue(channel -> channel.sendMessage("⚠️ ¡Alerta! " + robber + " Está robando tus diamantes en el Reino del Sabor...").queue());
         }
     }
 }

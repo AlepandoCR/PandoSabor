@@ -23,6 +23,8 @@ public class BossSpawner {
 
         base.setModel(model);
 
+        base.getBukkitEntity().addScoreboardTag("destructor");
+
         model.createModel(1.7f, (LivingEntity) base.getBukkitEntity());
     }
 
