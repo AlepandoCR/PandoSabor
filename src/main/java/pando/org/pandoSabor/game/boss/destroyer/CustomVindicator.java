@@ -1,7 +1,5 @@
 package pando.org.pandoSabor.game.boss.destroyer;
 
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -11,12 +9,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Spellcaster;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.boss.destroyer.goals.*;
 import pando.org.pandoSabor.utils.Model;

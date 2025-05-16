@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,7 +58,7 @@ public class GoalRangedBlast extends Goal {
         boss.setFlying(false);
 
         List<LivingEntity> nearby = boss.level().getEntitiesOfClass(LivingEntity.class,
-                boss.getBoundingBox().inflate(10),
+                boss.getBoundingBox().inflate(3.3),
                 e -> e != boss && e.isAlive());
 
         if (!nearby.isEmpty()) {
@@ -137,6 +138,7 @@ public class GoalRangedBlast extends Goal {
                         if (tick >= totalTicks || !display.isValid()) {
                             this.cancel();
                             display.remove();
+                            damageClose();
                             return;
                         }
 
@@ -148,6 +150,14 @@ public class GoalRangedBlast extends Goal {
                         display.teleport(loc);
 
                         tick++;
+                    }
+
+                    private void damageClose() {
+                        for (Entity nearbyEntity : display.getNearbyEntities(1.5, 1.5, 1.5)) {
+                            if(nearbyEntity instanceof org.bukkit.entity.LivingEntity livingEntity){
+                                livingEntity.damage(5,boss.getBukkitEntity());
+                            }
+                        }
                     }
                 }.runTaskTimer(boss.getPlugin(), 0L, 1L);
             }

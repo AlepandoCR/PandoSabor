@@ -142,12 +142,12 @@ public class GoalFlyToCenter extends Goal {
                                     Location eye = target.getEyeLocation();
                                     if (eye.getBlock().getLightFromSky() == 15) {
                                         world.strikeLightningEffect(strikeLoc);
-                                        target.damage(6.0); // daño del rayo
+                                        target.damage(3.0); // daño del rayo
                                     } else {
                                         target.sendMessage(ChatColor.AQUA + "¡Te has salvado del rayo por estar bajo techo!");
                                     }
                                 }
-                            }.runTaskLater(boss.getPlugin(), 20L);
+                            }.runTaskLater(boss.getPlugin(), 60L);
                         }
                     }
                 }

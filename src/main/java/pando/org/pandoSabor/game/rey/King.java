@@ -15,10 +15,12 @@ public class King {
     private int nivelIra; // 0 - 100
     private final QuestGenerator generador;
     private final Model kingModel;
+    private final Model kingModelColiseum;
 
     public King(PandoSabor plugin, QuestGenerator generador) {
         this.plugin = plugin;
         this.generador = generador;
+        this.kingModelColiseum = spawnKingModelColiseum();
         this.nivelIra = 0;
 
         this.kingModel = spawnKingModel();
@@ -44,6 +46,10 @@ public class King {
         return kingModel;
     }
 
+    public Model getKingModelColiseum() {
+        return kingModelColiseum;
+    }
+
     public void createQuest(Player player){
         player.sendMessage(getDialog());
         Quest q = assingQuest(player);
@@ -66,8 +72,17 @@ public class King {
         return new Location(Bukkit.getWorld("overworld"),-342.5, 92.00, 1649.5,180,0);
     }
 
+
     public Model spawnKingModel(){
         Model r = new Model(plugin, "king" ,getKingLocation());
+
+        r.createModel(1);
+
+        return r;
+    }
+
+    public Model spawnKingModelColiseum(){
+        Model r = new Model(plugin, "king" ,new Location(Bukkit.getWorld("overworld"),-1140.5,145.00,321.5,0,0));
 
         r.createModel(1);
 
