@@ -147,7 +147,7 @@ public class EntityListener implements Listener {
         World world = origin.getWorld();
         if (world == null) return;
 
-        int totalDiamonds = 10;
+        int totalDiamonds = 25;
         double radius = 0.5;
         double upwardVelocity = 0.3;
         double horizontalSpeed = 0.4;
