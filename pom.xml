@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>1.5.25</version> <!-- Usa una versión reciente y estable -->
+            <version>1.5.25</version>
         </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>

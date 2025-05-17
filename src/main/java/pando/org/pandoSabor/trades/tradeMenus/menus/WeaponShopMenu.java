@@ -17,7 +17,8 @@ public class WeaponShopMenu extends TradeMenu {
         addAll(
                 new BlockTadeItem(Material.TOTEM_OF_UNDYING, 5, plugin),
                 new BlockTadeItem(Material.END_CRYSTAL, 10, plugin),
-                new BlockTadeItem(Material.ENCHANTED_GOLDEN_APPLE, 5, plugin)
+                new BlockTadeItem(Material.ENCHANTED_GOLDEN_APPLE, 5, plugin),
+                new BlockTadeItem(Material.OBSIDIAN, 1, plugin)
         );
     }
 

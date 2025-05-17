@@ -1,12 +1,13 @@
 package pando.org.pandoSabor.listeners;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.discord.DiscordNotifier;
 import pando.org.pandoSabor.playerData.economy.WealthBlock;
@@ -106,6 +107,64 @@ public class BlockListener implements Listener {
                    }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onBlockExplode(BlockExplodeEvent event) {
+        event.blockList().removeIf(block -> block.getType() == Material.DIAMOND_BLOCK);
+    }
+
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        event.blockList().removeIf(block -> block.getType() == Material.DIAMOND_BLOCK);
+    }
+
+    @EventHandler
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        for (Block block : event.getBlocks()) {
+            if (block.getType() == Material.DIAMOND_BLOCK) {
+                event.setCancelled(true);
+                break;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        for (Block block : event.getBlocks()) {
+            if (block.getType() == Material.DIAMOND_BLOCK) {
+                event.setCancelled(true);
+                break;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockFade(BlockFadeEvent event) {
+        if (event.getBlock().getType() == Material.DIAMOND_BLOCK) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockBurn(BlockBurnEvent event) {
+        if (event.getBlock().getType() == Material.DIAMOND_BLOCK) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockFromTo(BlockFromToEvent event) {
+        if (event.getBlock().getType() == Material.DIAMOND_BLOCK) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockPhysics(BlockPhysicsEvent event) {
+        if (event.getBlock().getType() == Material.DIAMOND_BLOCK) {
+            event.setCancelled(true);
         }
     }
 }
