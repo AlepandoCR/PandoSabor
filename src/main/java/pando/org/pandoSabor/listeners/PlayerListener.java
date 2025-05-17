@@ -12,10 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Attr;
@@ -128,6 +125,30 @@ public class PlayerListener implements Listener {
                     1L
             );
         }
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        event.getTo();
+        if (isEnd(event.getTo().getWorld())) {
+            Player player = event.getPlayer();
+            player.sendMessage("§c¡El acceso al End está bloqueado!");
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPortal(PlayerPortalEvent event) {
+        event.getTo();
+        if (isEnd(event.getTo().getWorld())) {
+            Player player = event.getPlayer();
+            player.sendMessage("§cNo puedes usar portales al End.");
+            event.setCancelled(true);
+        }
+    }
+
+    private boolean isEnd(World world) {
+        return world != null && world.getEnvironment() == World.Environment.THE_END;
     }
 
     private void startTab(@NotNull Player player) {
