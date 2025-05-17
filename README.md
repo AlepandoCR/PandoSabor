@@ -7,3 +7,6 @@
 
 - 👉 [Descargar plugin `.jar`](https://github.com/AlepandoCR/repositorio/releases/download/v1.0.0/PandoSabor-1.0.0.jar)
 
+
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AlepandoCR/PandoSabor)
