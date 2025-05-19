@@ -29,7 +29,7 @@ public class ResearchQuest implements Quest, Listener {
     public String description() {
         return ChatColor.GOLD + "[" + ChatColor.YELLOW + "Misión del Rey" + ChatColor.GOLD + "]" +
                 ChatColor.GRAY + " Investiga una " + ChatColor.AQUA + "ubicación misteriosa" + ChatColor.GRAY +
-                " cerca de otro " + ChatColor.YELLOW + "aventurero" + ChatColor.GRAY + "[" + ChatColor.DARK_GRAY + objective.getX() + ChatColor.GRAY + "," + ChatColor.DARK_GRAY + objective.getY() + ChatColor.GRAY + "," + ChatColor.DARK_GRAY + objective.getZ() + ChatColor.GRAY + "]";
+                " cerca de otro " + ChatColor.YELLOW + "aventurero" + ChatColor.GRAY + " en el mundo " + objective.getWorld().getName() + " " + ChatColor.GRAY + "[" + ChatColor.AQUA + (int)  objective.getX() + ChatColor.GRAY + "," + ChatColor.AQUA + (int) objective.getY() + ChatColor.GRAY + "," + ChatColor.AQUA + (int)  objective.getZ() + ChatColor.GRAY + "]";
     }
 
     @Override
@@ -45,6 +45,10 @@ public class ResearchQuest implements Quest, Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.getPlayer().equals(questPlayer)) return;
+
+        if(completado) return;
+
+        if(!event.getTo().getWorld().equals(objective.getWorld())) return;
 
         if (event.getTo().distance(objective) <= range) {
             completado = true;

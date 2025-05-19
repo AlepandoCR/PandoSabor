@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Attr;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import static pando.org.pandoSabor.trades.tradeItems.TeleportationHeartPrize.*;
 
 public class PlayerListener implements Listener {
 
@@ -144,6 +147,28 @@ public class PlayerListener implements Listener {
             Player player = event.getPlayer();
             player.sendMessage("§cNo puedes usar portales al End.");
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onTeleporter(PlayerInteractEvent event){
+        Player player = event.getPlayer();
+        EquipmentSlot hand = event.getHand();
+        if(hand != null){
+            ItemStack stack = player.getInventory().getItem(event.getHand());
+            if(isTeleporterItem(plugin,stack)){
+                switch (event.getAction()){
+                    case LEFT_CLICK_AIR:
+                    case LEFT_CLICK_BLOCK:
+                        teleportWithAnimation(plugin,player,stack);
+                        break;
+                    case RIGHT_CLICK_AIR:
+                    case RIGHT_CLICK_BLOCK:
+                        setStoredLocation(plugin,stack,player.getLocation());
+                        player.sendMessage(ChatColor.GREEN + "Se ha guardado la localización correctamente");
+                        break;
+                }
+            }
         }
     }
 

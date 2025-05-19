@@ -13,6 +13,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BundleMeta;
 import pando.org.pandoSabor.PandoSabor;
 
+import java.util.function.Predicate;
+
 public class DiamondBlockRestrictions implements Listener {
 
     private final PandoSabor plugin;
@@ -44,72 +46,46 @@ public class DiamondBlockRestrictions implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (player.isOp()) return;
 
-        ItemStack cursor = event.getCursor();
         ItemStack current = event.getCurrentItem();
-        Inventory topInv = event.getView().getTopInventory();
+        ItemStack cursor = event.getCursor();
         Inventory clickedInventory = event.getClickedInventory();
+        Inventory topInventory = event.getView().getTopInventory();
+        Inventory bottomInventory = event.getView().getBottomInventory();
         InventoryAction action = event.getAction();
         ClickType click = event.getClick();
 
-        if(current != null){
-            if (current.getItemMeta() instanceof BundleMeta && isDiamondBlock(cursor)) {
+        boolean isMovingToPlayerInv = clickedInventory != null && clickedInventory.equals(topInventory) &&
+                event.getRawSlot() >= player.getInventory().getSize();
+
+        boolean b = clickedInventory == null || (!clickedInventory.equals(bottomInventory) && !isMovingToPlayerInv);
+        if (isDiamondBlock(cursor)) {
+            if (b) {
                 event.setCancelled(true);
                 return;
             }
+        }
 
-            if (cursor.getItemMeta() instanceof BundleMeta && isDiamondBlock(current)) {
-                event.setCancelled(true);
+        if (isDiamondBlock(current)) {
+            if (clickedInventory != null && clickedInventory.equals(bottomInventory)) {
                 return;
             }
-        }
 
+            if (event.isShiftClick()) {
 
-        if (clickedInventory != null && isPlayerInventory(clickedInventory) && topInv.getType().equals(InventoryType.CRAFTING) && !(action == InventoryAction.PLACE_ALL_INTO_BUNDLE || action == InventoryAction.PLACE_SOME_INTO_BUNDLE)) return;
+                if(clickedInventory == null){
+                    event.setCancelled(true);
+                    return;
+                }
 
-        if ((action == InventoryAction.PLACE_ALL || action == InventoryAction.PLACE_ONE || action == InventoryAction.PLACE_SOME || action == InventoryAction.PLACE_ALL_INTO_BUNDLE || action == InventoryAction.PLACE_SOME_INTO_BUNDLE)
-                && isDiamondBlock(cursor)) {
-
-            boolean cancel = true;
-
-            if(clickedInventory != null){
-                if(isPlayerInventory(clickedInventory)){
-                    cancel  = false;
+                Inventory destination = (clickedInventory.equals(topInventory)) ? bottomInventory : topInventory;
+                if (!destination.equals(player.getInventory())) {
+                    event.setCancelled(true);
+                    return;
                 }
             }
 
-            event.setCancelled(cancel);
-
-            return;
-        }
-
-        if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY && isDiamondBlock(current)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (clickedInventory != null && clickedInventory.getType() == InventoryType.SHULKER_BOX && isDiamondBlock(cursor)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (cursor.getType() == Material.BUNDLE) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (current != null && current.getType() == Material.BUNDLE && isDiamondBlock(cursor)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (isDiamondBlock(cursor) && cursor.getItemMeta() instanceof BlockStateMeta meta) {
-            if (meta.getBlockState() instanceof InventoryHolder holder) {
-                for (ItemStack content : holder.getInventory().getContents()) {
-                    if (isDiamondBlock(content)) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
+            if (b) {
+                event.setCancelled(true);
             }
         }
     }

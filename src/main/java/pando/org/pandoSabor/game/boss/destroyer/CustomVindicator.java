@@ -70,6 +70,11 @@ public class CustomVindicator extends Vindicator {
 
             @Override
             public void run() {
+                if(CustomVindicator.this.isDeadOrDying() || !CustomVindicator.this.getBukkitEntity().isValid()){
+                    this.cancel();
+                    return;
+                }
+
                 if (time != 0 && time % 60 == 0 && !hasGuardians) {
                     summonEvokerGuardians();
                 }else if(hasGuardians){

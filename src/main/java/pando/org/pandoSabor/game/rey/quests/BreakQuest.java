@@ -52,10 +52,23 @@ public class BreakQuest implements Quest, Listener {
 
         if(!player.equals(questPlayer)) return;
 
+        if(isCompleted(questPlayer)) return;
+
         Block block = event.getBlock();
         if (block.getType() == type) {
             progress++;
             ProgressMessage.sendProgressMessage(questPlayer,progress,amount);
+        }else{
+            if(block.getType().equals(Material.DEEPSLATE_GOLD_ORE) && type.equals(Material.GOLD_ORE)){
+                progress++;
+                ProgressMessage.sendProgressMessage(questPlayer,progress,amount);
+            }else if(block.getType().equals(Material.DEEPSLATE_IRON_ORE) && type.equals(Material.IRON_ORE)){
+                progress++;
+                ProgressMessage.sendProgressMessage(questPlayer,progress,amount);
+            }else if(block.getType().equals(Material.DEEPSLATE_LAPIS_ORE) && type.equals(Material.LAPIS_ORE)){
+                progress++;
+                ProgressMessage.sendProgressMessage(questPlayer,progress,amount);
+            }
         }
     }
 }

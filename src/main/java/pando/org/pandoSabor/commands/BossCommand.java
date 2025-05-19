@@ -2,14 +2,17 @@ package pando.org.pandoSabor.commands;
 
 import net.minecraft.server.level.ServerLevel;
 import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import pando.org.pandoSabor.PandoSabor;
 import pando.org.pandoSabor.game.boss.BossSpawner;
+import pando.org.pandoSabor.game.boss.EntityHealthBossBarTracker;
 import pando.org.pandoSabor.game.boss.destroyer.CustomVindicator;
 
 import java.util.Arrays;
@@ -47,6 +50,16 @@ public class BossCommand implements CommandExecutor, TabCompleter {
         );
 
         new BossSpawner(plugin).spawnBoss(vindicator);
+
+        EntityHealthBossBarTracker tracker = new EntityHealthBossBarTracker(plugin,vindicator.getBukkitLivingEntity(),ChatColor.RED + "Destructor", BarColor.RED);
+
+        for (Entity nearbyEntity : vindicator.getBukkitEntity().getNearbyEntities(30, 30, 30)) {
+            if(nearbyEntity instanceof Player player1){
+                tracker.addViewer(player1);
+            }
+        }
+
+        tracker.startTracking();
 
         return true;
     }

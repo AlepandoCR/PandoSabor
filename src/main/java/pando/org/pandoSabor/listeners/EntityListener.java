@@ -132,7 +132,7 @@ public class EntityListener implements Listener {
                 Location nextPos = new Location(world, x, y, z);
                 return nextPos;
             }
-        }.runTaskTimer(plugin, 0L, 1L); // cada tick
+        }.runTaskTimer(plugin, 0L, 1L); 
     }
 
     private void checkDeath() {

@@ -50,6 +50,8 @@ public class KillQuest implements Quest, Listener {
         if (event.getEntity().getKiller() == null) return;
         Player killer = event.getEntity().getKiller();
 
+        if(isCompleted(questPlayer)) return;
+
         if(!killer.equals(questPlayer)) return;
 
         if (event.getEntity().getType() == type) {
