@@ -30,7 +30,7 @@ public class GoalFlyToCenter extends Goal {
     @Override
     public boolean canUse() {
         List<LivingEntity> nearby = boss.level().getEntitiesOfClass(LivingEntity.class, boss.getBoundingBox().inflate(20), e -> e != boss);
-        return !boss.isFlying() && !nearby.isEmpty() && new Random().nextDouble() < 0.0015;
+        return !boss.isFlying() && !nearby.isEmpty() && new Random().nextDouble() < 0.0030;
     }
 
     @Override

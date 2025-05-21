@@ -54,6 +54,10 @@ public class DiamondBlockRestrictions implements Listener {
         InventoryAction action = event.getAction();
         ClickType click = event.getClick();
 
+        if(clickedInventory.getType().equals(InventoryType.CRAFTING)){
+            return;
+        }
+
         boolean isMovingToPlayerInv = clickedInventory != null && clickedInventory.equals(topInventory) &&
                 event.getRawSlot() >= player.getInventory().getSize();
 
